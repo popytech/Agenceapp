@@ -1,0 +1,78 @@
+{
+  "name": "erp-popytech-desktop",
+  "version": "1.0.0",
+  "description": "ERP Popytech - Application Desktop",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "setup": "node setup-env.js",
+    "build:next": "node setup-env.js && cd .. && npm install && npm run build",
+    "build:win": "electron-builder --win --x64",
+    "build:all": "node setup-env.js && cd .. && npm install && npm run build && cd electron && npm run build:win",
+    "pack": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.popytech.erp",
+    "productName": "ERP Popytech",
+    "copyright": "Copyright © 2026 Popytech",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "loading.html",
+      "icon.png",
+      "icon.ico"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "app",
+        "filter": [
+          "**/*",
+          "!electron/**",
+          "!.git/**",
+          "!.next/cache/**",
+          "!node_modules/.cache/**"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "installerHeaderIcon": "icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ERP Popytech",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "menuCategory": "Popytech"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icon.png",
+      "category": "public.app-category.business"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icon.png",
+      "category": "Office"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  }
+}
