@@ -2,6 +2,7 @@
 // v3 - fixed JSX structure
 import { useEffect, useState, useCallback } from 'react'
 import { supabase, Profile } from '@/lib/supabase'
+import { safeChannel } from '@/lib/realtime'
 import { toast } from 'sonner'
 import {
     Users, Mail, Phone, Shield, Search, Edit, CheckCircle2,
@@ -124,12 +125,9 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (!currentProfile?.id) return
-    const channel = supabase.channel('team-availability', {
-      config: { presence: { key: currentProfile.id } }
-    })
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState<{ status: AvailStatus }>()
+    const channel = safeChannel('team-availability', (ch) => {
+      ch.on('presence', { event: 'sync' }, () => {
+        const state = ch.presenceState<{ status: AvailStatus }>()
         const map: Record<string, AvailStatus> = {}
         Object.entries(state).forEach(([key, presences]) => {
           if (presences[0]) map[key] = presences[0].status
@@ -138,9 +136,10 @@ export default function TeamPage() {
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
-          await channel.track({ status: myStatus })
+          await ch.track({ status: myStatus })
         }
       })
+    }, { config: { presence: { key: currentProfile.id } } })
     presenceChannelRef[0] = channel
     return () => { supabase.removeChannel(channel) }
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { safeChannel } from '@/lib/realtime'
 import { toast } from 'sonner'
 import { formatGNF } from '@/lib/utils'
 import {
@@ -76,14 +77,14 @@ export default function ClientDashboard() {
 
   useEffect(() => {
     if (!client) return
-    const channel = supabase
-      .channel('client-messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'client_messages', filter: `client_id=eq.${client.id}` },
+    const channel = safeChannel('client-messages', (ch) => {
+      ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'client_messages', filter: `client_id=eq.${client.id}` },
         (payload) => {
           setMessages(prev => [...prev, payload.new])
           setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
         })
       .subscribe()
+    })
     return () => { supabase.removeChannel(channel) }
   }, [client])
 

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase, Task, Project } from '@/lib/supabase'
+import { safeChannel } from '@/lib/realtime'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import {
@@ -96,14 +97,15 @@ export default function ProjectDetailPage() {
 
   // Realtime on tasks
   useEffect(() => {
-    const channel = supabase.channel(`project-${projectId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `project_id=eq.${projectId}` }, () => {
+    const channel = safeChannel(`project-${projectId}`, (ch) => {
+      ch.on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `project_id=eq.${projectId}` }, () => {
         supabase.from('tasks').select('*').eq('project_id', projectId).order('created_at').then(({ data }) => setTasks(data || []))
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'project_comments', filter: `project_id=eq.${projectId}` }, (payload) => {
         setComments(prev => [...prev, payload.new])
       })
       .subscribe()
+    })
     return () => { supabase.removeChannel(channel) }
   }, [projectId])
 

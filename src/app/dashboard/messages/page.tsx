@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import { safeChannel } from '@/lib/realtime'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 
@@ -182,9 +183,8 @@ export default function MessagesPage() {
   useEffect(() => {
     if (!user) return
 
-    const channel = supabase
-      .channel(`messages-rt-${user.id}`)
-      .on(
+    const channel = safeChannel(`messages-rt-${user.id}`, (ch) => {
+      ch.on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload: any) => {
@@ -219,6 +219,7 @@ export default function MessagesPage() {
         }
       )
       .subscribe()
+    })
 
     return () => { supabase.removeChannel(channel) }
   }, [user, fetchConversations, playSound])
@@ -227,9 +228,8 @@ export default function MessagesPage() {
   useEffect(() => {
     if (!user) return
 
-    const channel = supabase
-      .channel('group-messages-rt')
-      .on(
+    const channel = safeChannel('group-messages-rt', (ch) => {
+      ch.on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'group_messages' },
         async (payload: any) => {
@@ -263,6 +263,7 @@ export default function MessagesPage() {
         }
       )
       .subscribe()
+    })
 
     return () => { supabase.removeChannel(channel) }
   }, [user, playSound])

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
+import { safeChannel } from '@/lib/realtime'
 import { useAuth } from '@/lib/auth-context'
 import {
   Popover, PopoverContent, PopoverTrigger
@@ -44,19 +45,17 @@ export default function NotificationsBell() {
   // Realtime subscription
   useEffect(() => {
     if (!profile?.id) return
-    const channelName = `notifications-bell-${profile.id}`
-    const channel = supabase.channel(channelName)
-
-    channel.on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${profile.id}`,
-      }, (payload) => {
-        setNotifications(prev => [payload.new, ...prev])
-      })
-
-    channel.subscribe()
+    const channel = safeChannel(`notifications-bell-${profile.id}`, (ch) => {
+      ch.on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${profile.id}`,
+        }, (payload) => {
+          setNotifications(prev => [payload.new, ...prev])
+        })
+        .subscribe()
+    })
 
     return () => {
       try {

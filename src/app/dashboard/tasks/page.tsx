@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
+import { safeChannel } from '@/lib/realtime'
 import { useAuth } from '@/lib/auth-context'
 import { getPermissions, isChefProjetOrAbove } from '@/lib/permissions'
 import { toast } from 'sonner'
@@ -1013,9 +1014,8 @@ function TaskDetailPanel({ task, members, currentProfile, onClose, onEdit, onDel
     }
     fetchComments()
     // Realtime : écouter les nouveaux commentaires
-    const channel = supabase
-      .channel(`task-comments-${task.id}`)
-      .on('postgres_changes', {
+    const channel = safeChannel(`task-comments-${task.id}`, (ch) => {
+      ch.on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'notifications',
         filter: `type=eq.task_comment`,
       }, (payload) => {
@@ -1025,6 +1025,7 @@ function TaskDetailPanel({ task, members, currentProfile, onClose, onEdit, onDel
         }
       })
       .subscribe()
+    })
     return () => { supabase.removeChannel(channel) }
   }, [task.id])
 
