@@ -35,6 +35,7 @@ debug.log
 .orchids/
 supabase/.temp/
 *.bak
+.recovery/
 
 # local environment variables
 .env*
