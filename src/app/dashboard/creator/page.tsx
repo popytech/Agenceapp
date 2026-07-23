@@ -1001,7 +1001,7 @@ export default function CreatorPage() {
     const [ideasRes, projectsRes, clientsRes, notifsRes] = await Promise.all([
       supabase.from('content_ideas').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('id,title,status,end_date').order('created_at', { ascending: false }),
-      supabase.from('clients').select('id,name').order('name'),
+      supabase.from('clients').select('id,name:company_name').order('company_name'),
       supabase.from('notifications').select('*').eq('user_id', profile.id).eq('is_read', false).order('created_at', { ascending: false }).limit(5),
     ])
     setIdeas(ideasRes.data || [])

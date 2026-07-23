@@ -65,7 +65,7 @@ interface Document {
 }
 
 interface Invoice {
-  id: string; invoice_number: string; amount: number; status: string
+  id: string; invoice_number: string; total_amount: number; paid_amount: number; status: string
   due_date: string | null; created_at: string
   clients?: { company_name: string }
 }
@@ -233,7 +233,7 @@ export default function AssistantePage() {
       supabase.from('hr_leave_requests').select('id,employee_id,start_date,end_date,type,reason,status,created_at,profiles(full_name)').order('created_at', { ascending: false }).limit(30),
       supabase.from('internal_announcements').select('id,title,message,priority,created_at,profiles(full_name)').order('created_at', { ascending: false }).limit(20),
       supabase.from('admin_documents').select('id,title,category,file_url,description,created_at,profiles(full_name)').order('created_at', { ascending: false }),
-      supabase.from('invoices').select('id,invoice_number,amount,status,due_date,created_at,clients(company_name)').in('status', ['sent', 'overdue']).order('due_date', { ascending: true }).limit(20),
+      supabase.from('invoices').select('id,invoice_number,total_amount,paid_amount,status,due_date,created_at,clients(company_name)').in('status', ['impayee', 'partielle']).order('due_date', { ascending: true }).limit(20),
     ])
     setProjects((p.data ?? []) as unknown as Project[])
     setMeetings((m.data ?? []) as Meeting[])
@@ -484,7 +484,7 @@ export default function AssistantePage() {
                           <div className="w-1.5 h-8 rounded-full bg-orange-500 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{i.clients?.company_name}</p>
-                            <p className="text-xs text-orange-500">{formatGNF(i.amount)} impayé</p>
+                            <p className="text-xs text-orange-500">{formatGNF(i.total_amount - i.paid_amount)} impayé</p>
                           </div>
                           <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                         </div>

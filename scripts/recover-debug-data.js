@@ -34,15 +34,55 @@ for (const line of lines) {
   const responseIndex = line.indexOf('response: ');
   if (responseIndex < 0) continue;
   const raw = line.slice(responseIndex + 'response: '.length).trim();
-  try {
-    const parsed = JSON.parse(raw);
-    const list = Array.isArray(parsed) ? parsed : [parsed];
+  {
+    const list = extractObjects(raw);
     for (const item of list) {
-      if (item && item.id) rows[currentTable].set(item.id, item);
+      if (!item || !item.id) continue;
+      const existing = rows[currentTable].get(item.id) || {};
+      const merged = { ...existing };
+      // Merge rather than replace: a later response with a narrower `select`
+      // (e.g. missing client_id) must not blank out a field a fuller
+      // response already captured for this row.
+      for (const [key, value] of Object.entries(item)) {
+        if (value !== null && value !== undefined) merged[key] = value;
+        else if (!(key in merged)) merged[key] = value;
+      }
+      rows[currentTable].set(item.id, merged);
     }
-  } catch {
-    // Ignore incomplete browser log lines.
   }
+}
+
+// The app's own debug logger truncates long lines (ending in
+// "... [truncated]"), which can cut a JSON array/object off mid-string. A
+// plain JSON.parse on the whole response then throws and the entire array
+// is lost — including complete objects that appeared before the cut. Scan
+// for individually well-formed top-level objects instead so those survive.
+function extractObjects(raw) {
+  const body = raw.startsWith('[') ? raw.slice(1) : raw;
+  const results = [];
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') { inString = true; continue; }
+    if (ch === '{') { if (depth === 0) start = i; depth++; continue; }
+    if (ch === '}') {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try { results.push(JSON.parse(body.slice(start, i + 1))); } catch {}
+        start = -1;
+      }
+    }
+  }
+  return results;
 }
 
 const columns = {
