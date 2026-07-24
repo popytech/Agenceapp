@@ -19,6 +19,7 @@ import {
   FolderKanban, ExternalLink
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
+import { toast } from 'sonner'
 import { downloadFormationReceiptPDF, downloadFormationCertificatePDF, downloadRegistrationsListPDF } from '@/lib/pdf'
 import type { CertificateOverrides } from '@/lib/pdf'
 
@@ -1500,6 +1501,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
     if (!form.training_id || !form.student_name || !form.student_email) return
     const { data: { user } } = await supabaseClient.auth.getUser()
     const training = trainings.find(t => t.id === form.training_id)
+    const registration_number = `INS-${new Date().getFullYear()}-${String(registrations.length + 1).padStart(4, '0')}`
     await supabaseClient.from('formation_registrations').insert({
       training_id: form.training_id,
       session_id: form.session_id || null,
@@ -1511,6 +1513,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
       amount_paid: 0,
       payment_status: 'pending',
       registration_status: 'confirmed',
+      registration_number,
       notes: form.notes || null,
       registered_by: user?.id
     })
@@ -1550,15 +1553,18 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
   async function handleQuickPay() {
     if (!payTarget || !payForm.amount) return
     const { data: { user } } = await supabaseClient.auth.getUser()
-    await supabaseClient.from('formation_payments').insert({
+    const receipt_number = `REC-${new Date().getFullYear()}-${String(payments.length + 1).padStart(4, '0')}`
+    const { data: payment, error } = await supabaseClient.from('formation_payments').insert({
       registration_id: payTarget.id,
       training_id: payTarget.training_id,
       student_name: payTarget.student_name,
       amount: parseFloat(payForm.amount),
       payment_method: payForm.payment_method,
       reference: payForm.reference || null,
+      receipt_number,
       collected_by: user?.id
-    })
+    }).select().single()
+    if (error) { toast.error('Erreur lors de l\'encaissement: ' + error.message); return }
     const newPaid = (payTarget.amount_paid || 0) + parseFloat(payForm.amount)
     const newStatus = newPaid >= payTarget.amount_due ? 'paid' : newPaid > 0 ? 'partial' : 'pending'
     await supabaseClient.from('formation_registrations').update({
@@ -1566,6 +1572,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
       payment_status: newStatus,
       updated_at: new Date().toISOString()
     }).eq('id', payTarget.id)
+    if (payment) printReceipt({ ...payTarget, amount_paid: newPaid }, payment)
     setPayOpen(false)
     setPayTarget(null)
     setPayForm({ amount: '', payment_method: 'cash', reference: '' })
@@ -1827,14 +1834,15 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
 
   const filtered = payments.filter(p =>
     !search || p.student_name.toLowerCase().includes(search.toLowerCase()) ||
-    p.receipt_number.toLowerCase().includes(search.toLowerCase())
+    (p.receipt_number || '').toLowerCase().includes(search.toLowerCase())
   )
 
   async function handleSave() {
     if (!form.student_name || !form.amount || !form.training_id) return
     const { data: { user } } = await supabaseClient.auth.getUser()
+    const receipt_number = `REC-${new Date().getFullYear()}-${String(payments.length + 1).padStart(4, '0')}`
 
-    await supabaseClient.from('formation_payments').insert({
+    const { data: payment, error } = await supabaseClient.from('formation_payments').insert({
       registration_id: form.registration_id || null,
       training_id: form.training_id,
       student_name: form.student_name,
@@ -1842,8 +1850,10 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
       payment_method: form.payment_method,
       reference: form.reference || null,
       notes: form.notes || null,
+      receipt_number,
       collected_by: user?.id
-    })
+    }).select().single()
+    if (error) { toast.error('Erreur lors de l\'encaissement: ' + error.message); return }
 
     if (form.registration_id) {
       const reg = registrations.find(r => r.id === form.registration_id)
@@ -1855,6 +1865,17 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
           payment_status: newStatus,
           updated_at: new Date().toISOString()
         }).eq('id', form.registration_id)
+        if (payment) {
+          const training = trainings.find(t => t.id === reg.training_id)
+          downloadFormationReceiptPDF(payment, training, {
+            registration_number: reg.registration_number,
+            student_email: reg.student_email,
+            student_phone: reg.student_phone,
+            student_company: reg.student_company,
+            amount_due: reg.amount_due,
+            amount_paid: newPaid,
+          })
+        }
       }
     }
 
