@@ -11,7 +11,7 @@ function getErrorMessage(error: any, fallback: string) {
 import {
   Plus, Search, BookOpen, Clock, Users, Edit, Trash2,
   ChevronDown, ChevronUp, Eye, EyeOff, GraduationCap,
-  TrendingUp, CheckCircle2, PlayCircle, BarChart3, UserPlus, Award, Database
+  TrendingUp, CheckCircle2, PlayCircle, BarChart3, UserPlus, Award
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,7 +32,6 @@ import { fr } from 'date-fns/locale'
 const emptyForm = { title: '', description: '', price: '', duration_hours: '', is_published: false, level: 'debutant', category: '' }
 const emptyModuleForm = { title: '', content: '', video_url: '', position: '' }
 const emptyEnrollForm = { full_name: '', phone: '', student_email: '', gender: 'homme', birth_date: '', profession: '', city: '', address: '', training_id: '', session_label: '', level: 'debutant', enrolled_at: new Date().toISOString().split('T')[0], course_start: '', course_end: '', price_gnf: 0, amount_paid: 0, payment_method: 'especes', commercial: '', trainer: '', room: '', attendance_status: 'present', progress: 0, certificate_issued: false, certificate_number: '', notes: '' }
-const ENROLLMENTS_FALLBACK_KEY = 'erp_enrollments_fallback'
 
 const LEVELS = [
   { value: 'debutant',      label: 'Débutant',     color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
@@ -88,38 +87,15 @@ export default function AcademyPage() {
   const [saving, setSaving]             = useState(false)
   const [activeTab, setActiveTab]       = useState('catalogue')
 
-  const [enrollmentsTableError, setEnrollmentsTableError] = useState(false)
-
+  // Academy (Gestion des inscrits) et Formations (Sessions & Formateurs)
+  // lisent/ecrivent maintenant la meme table - plus de doublon de donnees.
   const fetchAll = useCallback(async () => {
-    const [{ data: tr }, { data: en, error: enErr }, { data: regs }] = await Promise.all([
+    const [{ data: tr }, { data: regs }] = await Promise.all([
       supabase.from('trainings').select('*').order('created_at', { ascending: false }),
-      supabase.from('enrollments').select('*, trainings(title, price, duration_hours)').order('enrolled_at', { ascending: false }),
-      // Sessions & Formateurs (formations/page.tsx) inscrit ses etudiants dans
-      // formation_registrations, une table separee - on les recupere ici pour
-      // que les deux pages affichent les memes inscrits.
       supabase.from('formation_registrations').select('*, trainings(title, price, duration_hours)').order('registered_at', { ascending: false }),
     ])
-    const missing = enErr?.message?.includes('schema cache') || enErr?.message?.includes('relation') || enErr?.code === '42P01' || enErr?.code === 'PGRST205'
-    setEnrollmentsTableError(Boolean(missing))
     setTrainings(tr || [])
-    const ownEnrollments = missing ? await loadFallbackEnrollments() : (en || [])
-    const foreignRegistrations = (regs || []).map((r: any) => ({
-      id: r.id,
-      _source: 'formations' as const,
-      full_name: r.student_name,
-      student_name: r.student_name,
-      student_email: r.student_email,
-      phone: r.student_phone,
-      training_id: r.training_id,
-      trainings: r.trainings,
-      enrolled_at: r.registered_at || r.created_at,
-      status: r.registration_status === 'confirme' ? 'active' : r.registration_status === 'annule' ? 'dropped' : 'active',
-      progress: 0,
-      price_gnf: r.amount_due,
-      amount_paid: r.amount_paid,
-      notes: r.notes,
-    }))
-    setEnrollments([...ownEnrollments, ...foreignRegistrations])
+    setEnrollments((regs || []).map(normalizeEnrollment))
     setLoading(false)
   }, [])
 
@@ -210,59 +186,30 @@ export default function AcademyPage() {
     if (!enrollForm.full_name || !enrollForm.training_id) { toast.error('Nom et formation requis'); return }
     setSaving(true)
     const payload = serializeEnrollmentForm(enrollForm)
-    let error: any = null
-    if (enrollmentsTableError) {
-      const current = await loadFallbackEnrollments()
-      const nextPayload = normalizeEnrollment({ ...payload, id: editEnroll?.id || crypto.randomUUID(), trainings: trainings.find(t => t.id === enrollForm.training_id) ? { title: trainings.find(t => t.id === enrollForm.training_id)?.title, price: trainings.find(t => t.id === enrollForm.training_id)?.price, duration_hours: trainings.find(t => t.id === enrollForm.training_id)?.duration_hours } : null })
-      const next = editEnroll ? current.map(item => item.id === editEnroll.id ? nextPayload : item) : [nextPayload, ...current]
-      const result = await saveFallbackEnrollments(next)
-      error = result.error
-    } else {
-      const result = editEnroll
-        ? await supabase.from('enrollments').update(payload).eq('id', editEnroll.id)
-        : await supabase.from('enrollments').insert(payload)
-      error = result.error
-    }
-    if (error) toast.error(getErrorMessage(error, 'Opération impossible'))
+    const result = editEnroll
+      ? await supabase.from('formation_registrations').update(payload).eq('id', editEnroll.id)
+      : await supabase.from('formation_registrations').insert({
+          ...payload,
+          registration_number: `INS-${new Date().getFullYear()}-${String(enrollments.length + 1).padStart(4, '0')}`,
+        })
+    if (result.error) toast.error(getErrorMessage(result.error, 'Opération impossible'))
     else { toast.success(editEnroll ? 'Inscription modifiée' : 'Étudiant inscrit'); fetchAll(); setEnrollDialog(false) }
     setSaving(false)
   }
 
   async function handleEnrollDelete(id: string) {
     if (!confirm('Supprimer cette inscription ?')) return
-    if (enrollmentsTableError) {
-      const current = await loadFallbackEnrollments()
-      const result = await saveFallbackEnrollments(current.filter(item => item.id !== id))
-      if (result.error) return toast.error('Erreur: ' + result.error.message)
-    } else {
-      const { error } = await supabase.from('enrollments').delete().eq('id', id)
-      if (error) return toast.error(getErrorMessage(error, 'Opération impossible'))
-    }
+    const { error } = await supabase.from('formation_registrations').delete().eq('id', id)
+    if (error) return toast.error(getErrorMessage(error, 'Opération impossible'))
     toast.success('Inscription supprimée'); fetchAll()
   }
 
   async function updateProgress(id: string, progress: number) {
-    const status = progress >= 100 ? 'completed' : 'active'
-    if (enrollmentsTableError) {
-      const current = await loadFallbackEnrollments()
-      await saveFallbackEnrollments(current.map(item => item.id === id ? { ...item, progress, status } : item))
-    } else {
-      await supabase.from('enrollments').update({ progress, status }).eq('id', id)
-    }
+    const learning_status = progress >= 100 ? 'completed' : 'active'
+    await supabase.from('formation_registrations').update({ progress, learning_status }).eq('id', id)
     fetchAll()
   }
 
-
-  async function migrateToRealTable() {
-    const current = await loadFallbackEnrollments()
-    if (current.length === 0) return toast.info('Aucune donnée à migrer')
-    const payload = current.map(({ id, trainings, ...rest }) => rest)
-    const { error } = await supabase.from('enrollments').insert(payload)
-    if (error) return toast.error('Migration impossible: ' + error.message)
-    await supabase.from('settings').delete().eq('key', ENROLLMENTS_FALLBACK_KEY)
-    toast.success('Migration terminée')
-    fetchAll()
-  }
   const filtered = trainings.filter(t => search === '' || t.title.toLowerCase().includes(search.toLowerCase()))
   const filteredEnrollments = enrollments.filter(e => {
     const matchesSearch = (e.full_name || e.student_name).toLowerCase().includes(searchEnroll.toLowerCase()) || (e.trainings?.title || '').toLowerCase().includes(searchEnroll.toLowerCase()) || (e.session_label || '').toLowerCase().includes(searchEnroll.toLowerCase())
@@ -284,20 +231,6 @@ export default function AcademyPage() {
 
   return (
     <div className="p-4 md:p-6 space-y-5 max-w-7xl mx-auto">
-
-      {enrollmentsTableError && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50/80 px-4 py-3">
-          <div className="flex items-start gap-3">
-            <Database className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-            <div>
-              <p className="text-sm font-semibold text-amber-800">Mode sécurisé actif</p>
-              <p className="mt-0.5 text-sm text-amber-700">
-                Les inscriptions continuent de fonctionner normalement pendant la synchronisation des données.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -505,12 +438,7 @@ export default function AcademyPage() {
                             <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{initials(e.full_name || e.student_name)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <div className="font-medium text-sm flex items-center gap-1.5">
-                              {e.full_name || e.student_name}
-                              {e._source === 'formations' && (
-                                <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 border-violet-200 text-violet-600">Sessions & Formateurs</Badge>
-                              )}
-                            </div>
+                            <div className="font-medium text-sm">{e.full_name || e.student_name}</div>
                             <div className="text-xs text-muted-foreground">{e.student_email || 'Sans email'}{e.phone ? ` · ${e.phone}` : ''}</div>
                           </div>
                         </div>
@@ -787,72 +715,75 @@ export default function AcademyPage() {
   )
 }
 
+// formation_registrations est maintenant la seule table d'inscriptions
+// (partagee avec Sessions & Formateurs) - ces deux fonctions convertissent
+// entre ses colonnes reelles et la forme plate utilisee par le formulaire.
 function normalizeEnrollment(value: any) {
-  const rawNotes = typeof value.notes === 'string' ? value.notes : ''
-  let meta: any = {}
-  try { meta = rawNotes.trim().startsWith('{') ? JSON.parse(rawNotes) : {} } catch { meta = {} }
   return {
     id: String(value.id),
-    student_name: String(value.student_name || value.full_name || ''),
-    full_name: String(value.student_name || value.full_name || ''),
-    phone: meta.phone || '',
+    student_name: String(value.student_name || ''),
+    full_name: String(value.student_name || ''),
+    phone: value.student_phone || '',
     student_email: value.student_email || null,
-    gender: meta.gender || 'homme',
-    birth_date: meta.birth_date || '',
-    profession: meta.profession || '',
-    city: meta.city || '',
-    address: meta.address || '',
+    gender: value.gender || 'homme',
+    birth_date: value.birth_date || '',
+    profession: value.profession || '',
+    city: value.city || '',
+    address: value.address || '',
     training_id: String(value.training_id || ''),
-    session_label: meta.session_label || '',
-    level: meta.level || 'debutant',
-    enrolled_at: value.enrolled_at || new Date().toISOString().split('T')[0],
-    course_start: meta.course_start || '',
-    course_end: meta.course_end || '',
-    price_gnf: Number(meta.price_gnf || value.trainings?.price || 0),
-    amount_paid: Number(meta.amount_paid || 0),
-    payment_method: meta.payment_method || 'especes',
-    commercial: meta.commercial || '',
-    trainer: meta.trainer || '',
-    room: meta.room || '',
-    attendance_status: meta.attendance_status || 'present',
-    status: value.status || meta.status || 'active',
+    session_label: value.session_label || '',
+    level: value.level || 'debutant',
+    enrolled_at: value.registered_at ? String(value.registered_at).slice(0, 10) : new Date().toISOString().split('T')[0],
+    course_start: value.course_start || '',
+    course_end: value.course_end || '',
+    price_gnf: Number(value.amount_due || value.trainings?.price || 0),
+    amount_paid: Number(value.amount_paid || 0),
+    payment_method: value.payment_method || 'especes',
+    commercial: value.commercial || '',
+    trainer: value.trainer || '',
+    room: value.room || '',
+    attendance_status: value.attendance_status || 'present',
+    status: value.learning_status || 'active',
     progress: Number(value.progress || 0),
-    certificate_issued: Boolean(meta.certificate_issued),
-    certificate_number: meta.certificate_number || '',
-    notes: meta.comments || (rawNotes.trim().startsWith('{') ? '' : rawNotes) || null,
+    certificate_issued: Boolean(value.certificate_issued),
+    certificate_number: value.certificate_number || '',
+    notes: value.notes || null,
     trainings: value.trainings || null,
   }
 }
 
 function serializeEnrollmentForm(form: any) {
-  const paymentStatus = form.amount_paid <= 0 ? 'non_paye' : form.amount_paid >= form.price_gnf ? 'solde' : form.amount_paid < form.price_gnf / 2 ? 'acompte' : 'partiellement_paye'
+  const amount_due = Number(form.price_gnf) || 0
+  const amount_paid = Number(form.amount_paid) || 0
+  const payment_status = amount_paid <= 0 ? 'pending' : amount_paid >= amount_due ? 'paid' : 'partial'
   return {
     student_name: form.full_name,
     student_email: form.student_email || null,
+    student_phone: form.phone || null,
     training_id: form.training_id,
-    enrolled_at: form.enrolled_at,
-    status: Number(form.progress) >= 100 ? 'completed' : 'active',
+    registered_at: form.enrolled_at || null,
+    learning_status: Number(form.progress) >= 100 ? 'completed' : 'active',
+    registration_status: 'confirmed',
     progress: Number(form.progress) || 0,
-    notes: JSON.stringify({
-      phone: form.phone || '', gender: form.gender || 'homme', birth_date: form.birth_date || '', profession: form.profession || '', city: form.city || '', address: form.address || '',
-      session_label: form.session_label || '', level: form.level || 'debutant', course_start: form.course_start || '', course_end: form.course_end || '',
-      price_gnf: Number(form.price_gnf) || 0, amount_paid: Number(form.amount_paid) || 0, remaining_gnf: Math.max((Number(form.price_gnf) || 0) - (Number(form.amount_paid) || 0), 0), payment_status: paymentStatus,
-      payment_method: form.payment_method || 'especes', commercial: form.commercial || '', trainer: form.trainer || '', room: form.room || '', attendance_status: form.attendance_status || 'present',
-      certificate_issued: !!form.certificate_issued, certificate_number: form.certificate_number || '', comments: form.notes || ''
-    })
+    gender: form.gender || 'homme',
+    birth_date: form.birth_date || null,
+    profession: form.profession || null,
+    city: form.city || null,
+    address: form.address || null,
+    session_label: form.session_label || null,
+    level: form.level || 'debutant',
+    course_start: form.course_start || null,
+    course_end: form.course_end || null,
+    amount_due,
+    amount_paid,
+    payment_status,
+    payment_method: form.payment_method || 'especes',
+    commercial: form.commercial || null,
+    trainer: form.trainer || null,
+    room: form.room || null,
+    attendance_status: form.attendance_status || 'present',
+    certificate_issued: !!form.certificate_issued,
+    certificate_number: form.certificate_number || null,
+    notes: form.notes || null,
   }
-}
-
-async function loadFallbackEnrollments() {
-  const { data } = await supabase.from('settings').select('value').eq('key', ENROLLMENTS_FALLBACK_KEY).maybeSingle()
-  const raw = Array.isArray(data?.value) ? data.value : []
-  return raw.map(normalizeEnrollment)
-}
-
-async function saveFallbackEnrollments(enrollments: any[]) {
-  return supabase.from('settings').upsert({
-    key: ENROLLMENTS_FALLBACK_KEY,
-    value: enrollments,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'key' })
 }

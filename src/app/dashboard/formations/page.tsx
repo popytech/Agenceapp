@@ -1753,12 +1753,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
                     <tr key={r.id} className="border-b last:border-0 hover:bg-muted/30">
                       <td className="p-3 font-mono text-xs text-muted-foreground">{r.registration_number}</td>
                       <td className="p-3">
-                        <p className="font-medium flex items-center gap-1.5">
-                          {r.student_name}
-                          {(r as any)._source === 'academy' && (
-                            <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 border-blue-200 text-blue-600">Gestion des inscrits</Badge>
-                          )}
-                        </p>
+                        <p className="font-medium">{r.student_name}</p>
                         <p className="text-xs text-muted-foreground">{r.student_email}</p>
                         {r.student_phone && <p className="text-xs text-muted-foreground">{r.student_phone}</p>}
                         {r.student_company && <p className="text-xs text-muted-foreground italic">{r.student_company}</p>}
@@ -1774,9 +1769,6 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
                       </td>
                       <td className="p-3 text-xs text-muted-foreground">{new Date(r.registered_at).toLocaleDateString('fr-FR')}</td>
                       <td className="p-3">
-                        {(r as any)._source === 'academy' ? (
-                          <span className="text-[11px] text-muted-foreground italic">Gérer dans Gestion des inscrits</span>
-                        ) : (
                           <div className="flex items-center gap-1 flex-wrap">
                             {/* Encaisser */}
                             {r.payment_status !== 'paid' && (
@@ -1803,7 +1795,6 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
-                        )}
                       </td>
                     </tr>
                   )
@@ -2314,20 +2305,18 @@ useEffect(() => { setMounted(true) }, [])
 
 async function loadData() {
 setLoading(true)
-const [t, s, p, e, c, f, reg, pay, int, acadEnroll] = await Promise.all([
+const [t, s, p, e, c, f, reg, pay, int] = await Promise.all([
 supabaseClient.from('trainings').select('*').order('created_at', { ascending: false }),
 supabaseClient.from('training_sessions').select('*, trainings(title), profiles(full_name)').order('start_date', { ascending: false }),
 supabaseClient.from('profiles').select('id, full_name, role, email').order('full_name'),
 supabaseClient.from('session_enrollments').select('*, profiles(full_name), training_sessions(title, training_id, trainings(title))').order('enrolled_at', { ascending: false }),
 supabaseClient.from('academy_certifications').select('*, profiles!academy_certifications_student_id_fkey(full_name), trainings(title)').order('issued_at', { ascending: false }),
 supabaseClient.from('training_feedback').select('*, profiles(full_name), training_sessions(title, trainings(title))').order('submitted_at', { ascending: false }),
+// formation_registrations est maintenant la seule table d'inscrits,
+// partagee avec Gestion des inscrits (academy/page.tsx).
 supabaseClient.from('formation_registrations').select('*, trainings(title, price), training_sessions(title)').order('registered_at', { ascending: false }),
 supabaseClient.from('formation_payments').select('*, trainings(title)').order('payment_date', { ascending: false }),
 supabaseClient.from('interns').select('user_id'),
-// Gestion des inscrits (academy/page.tsx) inscrit ses etudiants dans la
-// table enrollments, separee de formation_registrations - on les recupere
-// ici pour que les deux pages affichent les memes inscrits.
-supabaseClient.from('enrollments').select('*, trainings(title, price)').order('enrolled_at', { ascending: false }),
 ])
 
 setTrainings(t.data || [])
@@ -2336,27 +2325,7 @@ setProfiles(p.data || [])
 setEnrollments(e.data || [])
 setCertifications(c.data || [])
 setFeedbacks(f.data || [])
-const foreignEnrollments = (acadEnroll.data || []).map((en: any) => ({
-  id: en.id,
-  _source: 'academy' as const,
-  training_id: en.training_id,
-  session_id: null,
-  student_name: en.full_name || en.student_name,
-  student_email: en.student_email || '',
-  student_phone: en.phone || null,
-  student_company: null,
-  registration_number: null,
-  amount_due: en.price_gnf || en.trainings?.price || 0,
-  amount_paid: en.amount_paid || 0,
-  payment_status: (en.amount_paid || 0) >= (en.price_gnf || en.trainings?.price || 0) ? 'paid' : (en.amount_paid || 0) > 0 ? 'partial' : 'pending',
-  registration_status: en.status === 'dropped' ? 'cancelled' : 'confirmed',
-  notes: en.notes,
-  registered_at: en.enrolled_at,
-  created_at: en.enrolled_at,
-  trainings: en.trainings,
-  training_sessions: null,
-}))
-setRegistrations([...(reg.data || []), ...foreignEnrollments])
+setRegistrations(reg.data || [])
 setPayments(pay.data || [])
 setInterns(int.data || [])
 setLoading(false)
