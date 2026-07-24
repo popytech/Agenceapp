@@ -111,6 +111,7 @@ export default function QuotesPage() {
 
     const { error } = await supabase.from('quotes').insert({
       ...form,
+      valid_until: form.valid_until || null,
       quote_number,
       items,
       subtotal,
@@ -152,7 +153,7 @@ export default function QuotesPage() {
           tax_rate: quote.tax_rate,
           total_amount: quote.total_amount,
           paid_amount: 0,
-          status: 'en_attente',
+          status: 'impayee',
           notes: `Facture générée depuis le devis ${quote.quote_number}`,
           created_by: profile?.id,
         })

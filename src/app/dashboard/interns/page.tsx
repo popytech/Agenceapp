@@ -59,6 +59,8 @@ export default function InternsPage() {
     setSaving(true)
     const { error } = await supabase.from('interns').update({
       ...form,
+      start_date: form.start_date || null,
+      end_date: form.end_date || null,
       evaluation_score: form.evaluation_score ? parseInt(form.evaluation_score) : null
     }).eq('id', editIntern.id)
     if (error) toast.error('Erreur')
