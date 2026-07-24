@@ -91,14 +91,35 @@ export default function AcademyPage() {
   const [enrollmentsTableError, setEnrollmentsTableError] = useState(false)
 
   const fetchAll = useCallback(async () => {
-    const [{ data: tr }, { data: en, error: enErr }] = await Promise.all([
+    const [{ data: tr }, { data: en, error: enErr }, { data: regs }] = await Promise.all([
       supabase.from('trainings').select('*').order('created_at', { ascending: false }),
       supabase.from('enrollments').select('*, trainings(title, price, duration_hours)').order('enrolled_at', { ascending: false }),
+      // Sessions & Formateurs (formations/page.tsx) inscrit ses etudiants dans
+      // formation_registrations, une table separee - on les recupere ici pour
+      // que les deux pages affichent les memes inscrits.
+      supabase.from('formation_registrations').select('*, trainings(title, price, duration_hours)').order('registered_at', { ascending: false }),
     ])
     const missing = enErr?.message?.includes('schema cache') || enErr?.message?.includes('relation') || enErr?.code === '42P01' || enErr?.code === 'PGRST205'
     setEnrollmentsTableError(Boolean(missing))
     setTrainings(tr || [])
-    setEnrollments(missing ? await loadFallbackEnrollments() : (en || []))
+    const ownEnrollments = missing ? await loadFallbackEnrollments() : (en || [])
+    const foreignRegistrations = (regs || []).map((r: any) => ({
+      id: r.id,
+      _source: 'formations' as const,
+      full_name: r.student_name,
+      student_name: r.student_name,
+      student_email: r.student_email,
+      phone: r.student_phone,
+      training_id: r.training_id,
+      trainings: r.trainings,
+      enrolled_at: r.registered_at || r.created_at,
+      status: r.registration_status === 'confirme' ? 'active' : r.registration_status === 'annule' ? 'dropped' : 'active',
+      progress: 0,
+      price_gnf: r.amount_due,
+      amount_paid: r.amount_paid,
+      notes: r.notes,
+    }))
+    setEnrollments([...ownEnrollments, ...foreignRegistrations])
     setLoading(false)
   }, [])
 
@@ -484,7 +505,12 @@ export default function AcademyPage() {
                             <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{initials(e.full_name || e.student_name)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <div className="font-medium text-sm">{e.full_name || e.student_name}</div>
+                            <div className="font-medium text-sm flex items-center gap-1.5">
+                              {e.full_name || e.student_name}
+                              {e._source === 'formations' && (
+                                <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 border-violet-200 text-violet-600">Sessions & Formateurs</Badge>
+                              )}
+                            </div>
                             <div className="text-xs text-muted-foreground">{e.student_email || 'Sans email'}{e.phone ? ` · ${e.phone}` : ''}</div>
                           </div>
                         </div>
@@ -528,13 +554,19 @@ export default function AcademyPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1 justify-end">
-                          {progress < 100 && (
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-600 hover:bg-emerald-50" title="Marquer 100% terminé" onClick={() => updateProgress(e.id, 100)}>
-                              <Award className="h-3.5 w-3.5" />
-                            </Button>
+                          {e._source === 'formations' ? (
+                            <span className="text-[11px] text-muted-foreground italic pr-1">Gérer dans Sessions & Formateurs</span>
+                          ) : (
+                            <>
+                              {progress < 100 && (
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-600 hover:bg-emerald-50" title="Marquer 100% terminé" onClick={() => updateProgress(e.id, 100)}>
+                                  <Award className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEnrollEdit(e)}><Edit className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleEnrollDelete(e.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                            </>
                           )}
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEnrollEdit(e)}><Edit className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleEnrollDelete(e.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
