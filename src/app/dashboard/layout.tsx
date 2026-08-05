@@ -62,6 +62,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="w-10" />
         </div>
         {children}
+        {/* Keeps the last row of any scrollable list clear of the fixed
+            FloatingActions button in the bottom-right corner. */}
+        <div className="h-24" aria-hidden="true" />
       </main>
       <GlobalSearch />
       <FloatingActions />

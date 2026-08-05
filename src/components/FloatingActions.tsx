@@ -42,7 +42,15 @@ export default function FloatingActions() {
         <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" onClick={() => setOpen(false)} />
       )}
 
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5">
+      {/*
+        pointer-events-none here is load-bearing: this flex column reserves
+        layout space for every ACTIONS item even while collapsed (opacity-0
+        isn't display:none), so without it the invisible stack silently
+        swallowed clicks on whatever page content happened to sit underneath
+        it as you scrolled — only the actually-visible button/items opt back
+        into pointer-events-auto below.
+      */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5 pointer-events-none">
         {/* Action items */}
         {ACTIONS.map((action, i) => {
           const Icon = action.icon
@@ -51,7 +59,7 @@ export default function FloatingActions() {
               key={action.key}
               className={cn(
                 'flex items-center gap-2.5 transition-all duration-200',
-                open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+                open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               )}
               style={{ transitionDelay: open ? `${i * 40}ms` : `${(ACTIONS.length - i) * 30}ms` }}
             >
@@ -78,7 +86,7 @@ export default function FloatingActions() {
         <button
           onClick={() => setOpen(prev => !prev)}
           className={cn(
-            'h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 hover:shadow-2xl',
+            'h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 hover:shadow-2xl pointer-events-auto',
             open && 'rotate-45 bg-foreground'
           )}
           title="Actions rapides (+)"
@@ -88,7 +96,7 @@ export default function FloatingActions() {
 
         {/* Hint */}
         {!open && (
-          <div className="flex items-center gap-1 text-[9px] text-muted-foreground opacity-60">
+          <div className="flex items-center gap-1 text-[9px] text-muted-foreground opacity-60 pointer-events-none">
             <Keyboard className="h-2.5 w-2.5" />
             <span>appuie sur +</span>
           </div>
