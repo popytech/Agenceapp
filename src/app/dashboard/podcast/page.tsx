@@ -354,7 +354,7 @@ export default function PodcastPage() {
 
       {/* Modal création/édition */}
       <Dialog open={showModal} onOpenChange={v => { if (!v) { setShowModal(false); setEditing(null) } }}>
-        <DialogContent className="max-w-2xl flex flex-col max-h-[90vh]">
+        <DialogContent className="sm:max-w-2xl flex flex-col max-h-[90vh]">
           <DialogHeader className="shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Mic className="w-5 h-5 text-[#0066FF]" />
@@ -441,7 +441,7 @@ export default function PodcastPage() {
 
       {/* Modal suppression */}
       <Dialog open={!!deleting} onOpenChange={v => !v && setDeleting(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Supprimer cet épisode ?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">L'épisode <strong>"{deleting?.title}"</strong> sera supprimé définitivement.</p>
           <div className="flex gap-2 mt-3">

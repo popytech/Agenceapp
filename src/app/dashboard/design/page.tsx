@@ -354,7 +354,7 @@ function TasksTab({ isManager }: { isManager: boolean }) {
 
       {/* Modal détail tâche */}
       <Dialog open={!!openTask} onOpenChange={() => setOpenTask(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 flex-wrap">
               <span>{openTask?.title}</span>
@@ -394,7 +394,7 @@ function TasksTab({ isManager }: { isManager: boolean }) {
 
       {/* Modal créer tâche */}
       <Dialog open={creating} onOpenChange={setCreating}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Assigner une tâche design</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs">Nom du projet *</Label>

@@ -375,7 +375,7 @@ function TasksTab({ tasks, profiles, onRefresh }: {
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-[#111] border-white/10 text-white sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? 'Modifier la tâche' : 'Nouvelle tâche design'}</DialogTitle>
           </DialogHeader>
@@ -637,7 +637,7 @@ function DeliverablesTab({ deliverables, tasks, onRefresh }: {
 
       {/* Add Livrable Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-[#111] border-white/10 text-white sm:max-w-md">
           <DialogHeader><DialogTitle>Ajouter un livrable</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-1.5">
@@ -712,7 +712,7 @@ function DeliverablesTab({ deliverables, tasks, onRefresh }: {
 
       {/* Feedback Dialog */}
       <Dialog open={!!showFeedback} onOpenChange={() => setShowFeedback(null)}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-[#111] border-white/10 text-white sm:max-w-md">
           <DialogHeader><DialogTitle>Demander une correction</DialogTitle></DialogHeader>
           {showFeedback && (
             <div className="space-y-4 pt-2">
@@ -856,7 +856,7 @@ function ResourcesTab({ resources, onRefresh }: { resources: DesignResource[]; o
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-[#111] border-white/10 text-white sm:max-w-md">
           <DialogHeader><DialogTitle>Ajouter une ressource</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-1.5">

@@ -488,7 +488,7 @@ export default function PortalPage() {
 
       {/* ── Client Detail Modal ── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           {selectedClient && (
             <>
               <DialogHeader>

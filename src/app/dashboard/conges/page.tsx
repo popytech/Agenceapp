@@ -398,7 +398,7 @@ export default function CongesPage() {
       </Card>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader><DialogTitle>{editing ? 'Modifier la demande' : 'Nouvelle demande de congé'}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             {!editing && team.length > 0 && (

@@ -291,7 +291,7 @@ export default function ExpensesPage() {
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing ? 'Modifier la dépense' : 'Nouvelle dépense'}</DialogTitle>
           </DialogHeader>

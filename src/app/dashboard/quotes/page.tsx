@@ -231,7 +231,7 @@ export default function QuotesPage() {
           <DialogTrigger asChild>
             <Button><Plus className="h-4 w-4 mr-2" />Nouveau devis</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Créer un devis</DialogTitle>
             </DialogHeader>
@@ -481,7 +481,7 @@ export default function QuotesPage() {
 
       {/* View dialog */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -574,7 +574,7 @@ export default function QuotesPage() {
 
         {/* Modal catalogue services/packs */}
         <Dialog open={showCatalog} onOpenChange={setShowCatalog}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-[#0066FF]">
                 <Package className="h-5 w-5" />

@@ -1181,7 +1181,7 @@ export default function InvoicesPage() {
 
       {/* Dialog paiement */}
       <Dialog open={!!paymentDialog} onOpenChange={() => setPaymentDialog(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Enregistrer un paiement</DialogTitle></DialogHeader>
           {paymentDialog && (
             <div className="space-y-4 pt-2">

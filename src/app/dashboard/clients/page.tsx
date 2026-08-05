@@ -614,7 +614,7 @@ export default function ClientsPage() {
 
       {/* ─── CREATE / EDIT DIALOG ─── */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg bg-white border-gray-200">
+        <DialogContent className="sm:max-w-lg bg-white border-gray-200">
           <DialogHeader>
             <DialogTitle className="text-gray-900">{editClient ? 'Modifier le client' : 'Nouveau client'}</DialogTitle>
           </DialogHeader>
@@ -679,7 +679,7 @@ export default function ClientsPage() {
 
       {/* ─── FICHE CLIENT DIALOG ─── */}
       <Dialog open={!!viewClient} onOpenChange={() => setViewClient(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 bg-white border-gray-200">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 bg-white border-gray-200">
           {viewClient && (
             <>
               {/* Header gradient */}

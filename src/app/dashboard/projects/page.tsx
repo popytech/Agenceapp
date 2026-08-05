@@ -547,7 +547,7 @@ export default function ProjectsPage() {
 
       {/* Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editProject ? 'Modifier le projet' : 'Nouveau projet'}</DialogTitle>
           </DialogHeader>

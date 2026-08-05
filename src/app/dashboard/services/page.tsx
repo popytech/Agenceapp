@@ -420,7 +420,7 @@ function ServicesTab({ services, loading, onReload }: {
 
       {/* Modal service */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-[#0066FF]">
               <Package className="h-5 w-5" />
@@ -676,7 +676,7 @@ function PacksTab({ packs, services, loading, onReload }: {
 
       {/* Modal pack */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-[#6A00FF]">
               <Layers className="h-5 w-5" />{editing ? 'Modifier le pack' : 'Nouveau pack'}
@@ -958,7 +958,7 @@ function SubscriptionsTab({ subs, clients, services, packs, loading, onReload, o
 
       {/* Modal abonnement */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-[#00E5FF]">
               <RotateCcw className="h-5 w-5" />{editing ? "Modifier l'abonnement" : 'Nouvel abonnement'}

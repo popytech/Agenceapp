@@ -591,7 +591,7 @@ export default function TeamPage() {
 
         {/* ── FICHE MEMBRE ── */}
         <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
-          <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl gap-0">
+          <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-2xl gap-0">
             {selectedMember && (() => {
               const role = roleConfig[selectedMember.role]
               const w = workloadInfo(selectedMember.activeTasksCount)
@@ -773,7 +773,7 @@ export default function TeamPage() {
 
         {/* ── EDIT DIALOG ── */}
         <Dialog open={!!editMember} onOpenChange={() => setEditMember(null)}>
-          <DialogContent className="max-w-sm rounded-2xl">
+          <DialogContent className="sm:max-w-sm rounded-2xl">
             <DialogHeader><DialogTitle>Modifier le rôle</DialogTitle></DialogHeader>
             {editMember && (
               <div className="space-y-4 py-2">
@@ -820,7 +820,7 @@ export default function TeamPage() {
 
         {/* ── CONFIRM DELETE ── */}
         <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
-          <DialogContent className="max-w-sm rounded-2xl">
+          <DialogContent className="sm:max-w-sm rounded-2xl">
             <DialogHeader><DialogTitle className="text-destructive">Supprimer ce profil ?</DialogTitle></DialogHeader>
             {confirmDelete && (
               <div className="space-y-4 py-2">
@@ -847,7 +847,7 @@ export default function TeamPage() {
 
         {/* ── RESET PASSWORD DIALOG ── */}
         <Dialog open={!!resetPasswordMember} onOpenChange={() => { setResetPasswordMember(null); setNewPassword('') }}>
-          <DialogContent className="max-w-sm rounded-2xl">
+          <DialogContent className="sm:max-w-sm rounded-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <KeyRound className="h-4 w-4 text-amber-500" /> Réinitialiser le mot de passe

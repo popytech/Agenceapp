@@ -1026,7 +1026,7 @@ export default function CommercialDashboard() {
 
     {/* ── MODAL: NOUVEAU LEAD ── */}
     <Dialog open={showLeadModal} onOpenChange={setShowLeadModal}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nouveau prospect / lead</DialogTitle>
         </DialogHeader>
@@ -1103,7 +1103,7 @@ export default function CommercialDashboard() {
 
     {/* ── MODAL: PLANIFIER RDV ── */}
     <Dialog open={showRdvModal} onOpenChange={setShowRdvModal}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Planifier un RDV</DialogTitle>
         </DialogHeader>
@@ -1174,7 +1174,7 @@ export default function CommercialDashboard() {
 
     {/* ── MODAL: NOUVELLE PROPOSITION ── */}
     <Dialog open={showProposalModal} onOpenChange={setShowProposalModal}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nouvelle proposition commerciale</DialogTitle>
         </DialogHeader>
@@ -1225,7 +1225,7 @@ export default function CommercialDashboard() {
 
     {/* ── Modal Envoyer Proposition ── */}
     <Dialog open={showSendModal} onOpenChange={setShowSendModal}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="h-4 w-4 text-green-600" />

@@ -347,7 +347,7 @@ export default function DevPage() {
       {/* ── Modals ── */}
       {/* Ticket */}
       <Dialog open={showTicketModal} onOpenChange={setShowTicketModal}>
-        <DialogContent className="max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
+        <DialogContent className="sm:max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
           <DialogHeader><DialogTitle className="font-mono text-emerald-400">+ new ticket</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs font-mono text-slate-400">Titre *</Label><Input value={ticketForm.title} onChange={e => setTicketForm(f => ({...f, title: e.target.value}))} placeholder="ex: Fix bug login page" className="mt-1 font-mono text-sm bg-slate-900 border-slate-700" /></div>
@@ -393,7 +393,7 @@ export default function DevPage() {
 
       {/* Project */}
       <Dialog open={showProjectModal} onOpenChange={setShowProjectModal}>
-        <DialogContent className="max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
+        <DialogContent className="sm:max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
           <DialogHeader><DialogTitle className="font-mono text-emerald-400">+ new project</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs font-mono text-slate-400">Nom du projet *</Label><Input value={projectForm.name} onChange={e => setProjectForm(f => ({...f, name: e.target.value}))} className="mt-1 bg-slate-900 border-slate-700 font-mono text-sm" /></div>
@@ -425,7 +425,7 @@ export default function DevPage() {
 
       {/* Bug */}
       <Dialog open={showBugModal} onOpenChange={setShowBugModal}>
-        <DialogContent className="max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
+        <DialogContent className="sm:max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
           <DialogHeader><DialogTitle className="font-mono text-red-400">⚠ report bug</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs font-mono text-slate-400">Titre *</Label><Input value={bugForm.title} onChange={e => setBugForm(f => ({...f, title: e.target.value}))} className="mt-1 bg-slate-900 border-slate-700 font-mono text-sm" /></div>
@@ -462,7 +462,7 @@ export default function DevPage() {
 
       {/* Deployment */}
       <Dialog open={showDepModal} onOpenChange={setShowDepModal}>
-        <DialogContent className="max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
+        <DialogContent className="sm:max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
           <DialogHeader><DialogTitle className="font-mono text-emerald-400">▲ deploy</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div className="grid grid-cols-2 gap-3">
@@ -491,7 +491,7 @@ export default function DevPage() {
 
       {/* Doc */}
       <Dialog open={showDocModal} onOpenChange={setShowDocModal}>
-        <DialogContent className="max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
+        <DialogContent className="sm:max-w-lg" style={{ background: '#0f1729', border: '1px solid rgba(255,255,255,0.1)', color: '#f1f5f9' }}>
           <DialogHeader><DialogTitle className="font-mono text-purple-400">📄 add doc</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs font-mono text-slate-400">Titre *</Label><Input value={docForm.title} onChange={e => setDocForm(f => ({...f, title: e.target.value}))} className="mt-1 bg-slate-900 border-slate-700 font-mono text-sm" /></div>

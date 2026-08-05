@@ -1006,7 +1006,7 @@ export default function AssistantePage() {
 
         {/* Modal RDV */}
         <Dialog open={showMeetingModal} onOpenChange={setShowMeetingModal}>
-          <DialogContent className="max-w-lg rounded-2xl">
+          <DialogContent className="sm:max-w-lg rounded-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-[#0066FF]/10 border border-[#0066FF]/20 flex items-center justify-center">
@@ -1057,7 +1057,7 @@ export default function AssistantePage() {
 
         {/* Modal Annonce */}
         <Dialog open={showAnnouncementModal} onOpenChange={setShowAnnouncementModal}>
-          <DialogContent className="max-w-lg rounded-2xl flex flex-col max-h-[90vh]">
+          <DialogContent className="sm:max-w-lg rounded-2xl flex flex-col max-h-[90vh]">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
@@ -1121,7 +1121,7 @@ export default function AssistantePage() {
 
         {/* Modal Document */}
         <Dialog open={showDocumentModal} onOpenChange={setShowDocumentModal}>
-          <DialogContent className="max-w-lg rounded-2xl">
+          <DialogContent className="sm:max-w-lg rounded-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-[#0066FF]/10 border border-[#0066FF]/20 flex items-center justify-center">
@@ -1162,7 +1162,7 @@ export default function AssistantePage() {
 
         {/* Modal Congé */}
         <Dialog open={showLeaveModal} onOpenChange={setShowLeaveModal}>
-          <DialogContent className="max-w-lg rounded-2xl">
+          <DialogContent className="sm:max-w-lg rounded-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
@@ -1228,7 +1228,7 @@ export default function AssistantePage() {
 
         {/* Modal Présence */}
         <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
-          <DialogContent className="max-w-md rounded-2xl">
+          <DialogContent className="sm:max-w-md rounded-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">

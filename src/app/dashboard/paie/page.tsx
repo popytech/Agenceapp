@@ -462,7 +462,7 @@ export default function PaiePage() {
 
       {/* ── Dialog ── */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
               {editing ? 'Modifier la fiche de paie' : 'Nouvelle fiche de paie'}

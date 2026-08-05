@@ -270,7 +270,7 @@ function FormationsTab({ trainings, sessions, reload }: { trainings: Training[];
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="w-4 h-4 mr-1" />Nouvelle formation</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader><DialogTitle>Nouvelle formation</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Titre *</Label><Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} /></div>
@@ -411,7 +411,7 @@ function SessionsTab({ sessions, trainings, profiles, enrollments, reload }: {
           <DialogTrigger asChild>
             <Button size="sm" className="ml-auto"><Plus className="w-4 h-4 mr-1" />Planifier session</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader><DialogTitle>{editSession ? 'Modifier la session' : 'Planifier une session'}</DialogTitle></DialogHeader>
             <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
               <div><Label>Formation *</Label>
@@ -466,7 +466,7 @@ function SessionsTab({ sessions, trainings, profiles, enrollments, reload }: {
           </Dialog>
 
           <Dialog open={!!deleteSession} onOpenChange={v => !v && setDeleteSession(null)}>
-            <DialogContent className="max-w-sm">
+            <DialogContent className="sm:max-w-sm">
               <DialogHeader><DialogTitle>Supprimer la session ?</DialogTitle></DialogHeader>
               <p className="text-sm text-muted-foreground">La session <strong>{deleteSession?.title || deleteSession?.trainings?.title}</strong> sera supprimée définitivement.</p>
               <div className="flex gap-2 mt-2">
@@ -730,7 +730,7 @@ function ApprenantsTab({ enrollments, sessions, trainings, registrations, profil
     <div className="space-y-4">
       {/* Edit Dialog */}
       <Dialog open={!!editEnroll} onOpenChange={v => !v && setEditEnroll(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Modifier l'apprenant</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <p className="text-sm font-medium">{editEnroll?.profiles?.full_name}</p>
@@ -758,7 +758,7 @@ function ApprenantsTab({ enrollments, sessions, trainings, registrations, profil
 
       {/* Delete Dialog */}
       <Dialog open={!!deleteEnroll} onOpenChange={v => !v && setDeleteEnroll(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Retirer l'apprenant ?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">L'apprenant <strong>{deleteEnroll?.profiles?.full_name}</strong> sera retiré de la session.</p>
           <div className="flex gap-2 mt-4">
@@ -1209,7 +1209,7 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
       </div>
 
       <Dialog open={!!deleteCert} onOpenChange={v => !v && setDeleteCert(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Supprimer le certificat ?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Le certificat de <strong>{deleteCert?.profiles?.full_name}</strong> sera supprimé définitivement.</p>
           <div className="flex gap-2 mt-2">
@@ -1221,7 +1221,7 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
 
       {/* Modal preview + téléchargement */}
       <Dialog open={!!certPreview} onOpenChange={o => { if (!o) setCertPreview(null) }}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Award className="w-5 h-5 text-[#0066FF]" />
@@ -1601,7 +1601,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
   const unpaid = registrations.filter(r => r.payment_status !== 'paid').length
 
   const formDialog = (isEdit: boolean) => (
-    <DialogContent className="max-w-lg">
+    <DialogContent className="sm:max-w-lg">
       <DialogHeader><DialogTitle>{isEdit ? 'Modifier inscription' : 'Inscrire un apprenant'}</DialogTitle></DialogHeader>
       <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
         <div><Label>Formation *</Label>
@@ -1684,7 +1684,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
 
       {/* Delete confirm dialog */}
       <Dialog open={!!deleteReg} onOpenChange={v => { if (!v) setDeleteReg(null) }}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Supprimer l'inscription</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Confirmer la suppression de l'inscription de <strong>{deleteReg?.student_name}</strong> ? Cette action est irréversible.</p>
           <div className="flex gap-2 mt-4">
@@ -1696,7 +1696,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
 
       {/* Quick payment dialog */}
       <Dialog open={payOpen} onOpenChange={v => { setPayOpen(v); if (!v) { setPayTarget(null); setPayForm({ amount: '', payment_method: 'cash', reference: '' }) } }}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Encaisser un paiement</DialogTitle></DialogHeader>
           {payTarget && (
             <div className="space-y-3">
@@ -1913,7 +1913,7 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
     <div className="space-y-4">
       {/* Confirm delete dialog */}
       <Dialog open={!!deleteTarget} onOpenChange={v => !v && setDeleteTarget(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Supprimer cet encaissement ?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">
             Encaissement de <strong>{deleteTarget?.amount.toLocaleString('fr-FR')} GNF</strong> pour <strong>{deleteTarget?.student_name}</strong> sera supprimé définitivement et le solde de l'inscription sera recalculé.
@@ -1942,7 +1942,7 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
           <DialogTrigger asChild>
             <Button size="sm"><CreditCard className="w-4 h-4 mr-1" />Encaisser paiement</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader><DialogTitle>Enregistrer un paiement</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Inscription liée (optionnel)</Label>

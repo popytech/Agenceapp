@@ -301,7 +301,7 @@ export default function CalendarPage() {
 
       {/* Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{editAppt ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}</DialogTitle>
           </DialogHeader>

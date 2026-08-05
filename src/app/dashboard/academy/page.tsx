@@ -548,7 +548,7 @@ export default function AcademyPage() {
 
       {/* ── Dialog: Training ── */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editTraining ? 'Modifier la formation' : 'Nouvelle formation'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="space-y-2">
@@ -598,7 +598,7 @@ export default function AcademyPage() {
 
       {/* ── Dialog: Module ── */}
       <Dialog open={!!moduleDialog} onOpenChange={() => setModuleDialog(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Ajouter un module — {moduleDialog?.title}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="space-y-2"><Label>Titre du module *</Label><Input placeholder="Ex: Introduction" value={moduleForm.title} onChange={e => setModuleForm(f => ({ ...f, title: e.target.value }))} /></div>
@@ -617,7 +617,7 @@ export default function AcademyPage() {
 
       {/* ── Dialog: Formulaire d'inscription & lien public ── */}
       <Dialog open={!!formDialog} onOpenChange={(v) => !v && setFormDialog(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Formulaire & lien d'inscription — {formDialog?.title}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="space-y-2">
@@ -680,7 +680,7 @@ export default function AcademyPage() {
 
       {/* ── Dialog: Enrollment ── */}
       <Dialog open={enrollDialog} onOpenChange={setEnrollDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editEnroll ? 'Modifier l\'inscription' : 'Inscrire un étudiant'}</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid grid-cols-2 gap-3">
