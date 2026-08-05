@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
+import { getEffectiveRole } from '@/lib/permissions'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, LineChart, Line
@@ -321,7 +322,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [activeView, setActiveView] = useState<string>('unified')
 
-  const isAdminRole = profile?.role && ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(profile.role)
+  const effectiveRole = getEffectiveRole(profile)
+  const isAdminRole = effectiveRole && ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(effectiveRole)
 
   useEffect(() => {
     if (viewParam) setActiveView(viewParam)
@@ -332,7 +334,7 @@ export default function DashboardPage() {
     try {
       const today = format(new Date(), 'yyyy-MM-dd')
       const userId = profile.id
-      const role = profile.role
+      const role = getEffectiveRole(profile) || profile.role
       const isAdmin = ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(role)
 
       let projectsQuery = supabase.from('projects').select('id, status, title, progress, created_at, created_by, clients(company_name)')
@@ -346,7 +348,13 @@ export default function DashboardPage() {
 
       if (!isAdmin) {
         tasksQuery = tasksQuery.eq('assigned_to', userId)
-        projectsQuery = (supabase.from('projects').select('id, status, title, progress, created_at, created_by, clients(company_name), tasks(assigned_to)').or(`created_by.eq.${userId},tasks.assigned_to.eq.${userId}`) as any)
+        // PostgREST's or() can't filter on an embedded table's column
+        // (tasks.assigned_to) directly -- resolve the user's task project ids
+        // first, then OR against the plain projects.id column instead.
+        const { data: myTaskProjects } = await supabase.from('tasks').select('project_id').eq('assigned_to', userId)
+        const myTaskProjectIds = [...new Set((myTaskProjects || []).map(t => t.project_id).filter(Boolean))]
+        const projectIdsFilter = myTaskProjectIds.length > 0 ? `,id.in.(${myTaskProjectIds.join(',')})` : ''
+        projectsQuery = projectsQuery.or(`created_by.eq.${userId}${projectIdsFilter}`)
         pubsQuery = pubsQuery.eq('assigned_to', userId)
         invoicesQuery = invoicesQuery.eq('created_by', userId)
         leadsQuery = leadsQuery.eq('assigned_to', userId)
@@ -501,7 +509,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (profile?.role) {
-      const role = profile.role
+      const role = getEffectiveRole(profile) || profile.role
       const isAdmin = ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(role)
       if (!isAdmin) {
         if ((role as string) === 'copywriter') setActiveView('creatrice_contenu')
@@ -513,7 +521,7 @@ export default function DashboardPage() {
         setActiveView(viewParam)
       }
     }
-  }, [profile?.role, viewParam])
+  }, [profile?.role, profile?.email, viewParam])
 
   if (loading || !data || !profile) return <Skeleton />
 
@@ -528,7 +536,7 @@ export default function DashboardPage() {
 
   const renderMetierView = () => {
     const userId = profile.id
-    const role = profile.role || 'client'
+    const role = getEffectiveRole(profile) || profile.role || 'client'
     const isAdmin = ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(role)
     const v = isAdmin ? activeView : role
 

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
-import { getPermissions } from '@/lib/permissions'
+import { getPermissions, getEffectiveRole } from '@/lib/permissions'
 import { toast } from 'sonner'
 import {
   BookOpen, Plus, ChevronDown, ChevronUp, User,
@@ -64,8 +64,8 @@ const emptyForm = {
 
 export default function JournalPage() {
   const { profile } = useAuth()
-  const perms = getPermissions(profile?.role)
-  const isAdmin = ['super_admin', 'chef_projet', 'ceo', 'dirigeant'].includes(profile?.role || '')
+  const perms = getPermissions(getEffectiveRole(profile))
+  const isAdmin = ['super_admin', 'chef_projet', 'ceo', 'dirigeant'].includes(getEffectiveRole(profile) || '')
 
   const [reports, setReports] = useState<DailyReport[]>([])
   const [myReports, setMyReports] = useState<DailyReport[]>([])
@@ -84,12 +84,13 @@ export default function JournalPage() {
 
   const profileId = profile?.id
   const profileRole = profile?.role
+  const profileEmail = profile?.email
 
   const load = useCallback(async () => {
     if (!profileId) return
     setLoading(true)
 
-    const admin = ['super_admin', 'chef_projet', 'ceo', 'dirigeant'].includes(profileRole || '')
+    const admin = ['super_admin', 'chef_projet', 'ceo', 'dirigeant'].includes(getEffectiveRole({ role: profileRole, email: profileEmail }) || '')
 
     const { data: myData } = await supabase
       .from('daily_reports')
@@ -112,7 +113,7 @@ export default function JournalPage() {
     }
 
     setLoading(false)
-  }, [profileId, profileRole])
+  }, [profileId, profileRole, profileEmail])
 
   useEffect(() => { load() }, [load])
 

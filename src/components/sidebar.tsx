@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import { getEffectiveRole } from '@/lib/permissions'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import {
@@ -626,9 +627,12 @@ export default function Sidebar({ mobileOpen: propsMobileOpen, setMobileOpen: pr
   const { theme, setTheme } = useTheme()
 
   const dbRole = profile?.role || (user?.email?.toLowerCase().trim() === 'contact@popytech.com' ? 'super_admin' : 'client')
-  const isAdmin = ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(dbRole)
-  
-  const activeRole = (isAdmin && viewParam) ? viewParam : dbRole
+  // navRole peut differer de dbRole pour un compte a permissions elevees
+  // (ex: un CM avec les pouvoirs du CEO) sans que son badge de role change.
+  const navRole = getEffectiveRole(profile) || dbRole
+  const isAdmin = ['super_admin', 'ceo', 'dirigeant', 'chef_projet'].includes(navRole)
+
+  const activeRole = (isAdmin && viewParam) ? viewParam : navRole
   const isAdminViewingMetier = !!(isAdmin && viewParam)
   
   // Debug log to verify role detection

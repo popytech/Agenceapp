@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase, Project, Client } from '@/lib/supabase'
 import { cacheGet, cacheSet, cacheInvalidate } from '@/lib/cache'
 import { useAuth } from '@/lib/auth-context'
-import { getPermissions, isChefProjetOrAbove } from '@/lib/permissions'
+import { getPermissions, isChefProjetOrAbove, getEffectiveRole } from '@/lib/permissions'
 import { toast } from 'sonner'
 
 function getErrorMessage(error: any, fallback: string) {
@@ -97,8 +97,8 @@ function ProgressBar({ pct, color }: { pct: number; color: string }) {
 
 export default function ProjectsPage() {
   const { profile } = useAuth()
-  const perms = getPermissions(profile?.role)
-  const isManager = isChefProjetOrAbove(profile?.role)
+  const perms = getPermissions(getEffectiveRole(profile))
+  const isManager = isChefProjetOrAbove(getEffectiveRole(profile))
   const [projects, setProjects] = useState<any[]>([])
   const [clients, setClients] = useState<any[]>([])
   const [search, setSearch] = useState('')

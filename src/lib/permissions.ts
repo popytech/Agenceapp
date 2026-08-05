@@ -259,3 +259,20 @@ export function isAdmin(role: string | undefined | null): boolean {
 export function isChefProjetOrAbove(role: string | undefined | null): boolean {
   return role === 'ceo' || role === 'super_admin' || role === 'chef_projet'
 }
+
+/**
+ * Comptes specifiques qui gardent leur role affiche mais ont les permissions
+ * du role indique ici. Ex : ce CM supervise toute l'equipe avec les pouvoirs
+ * du CEO (voir tous les projets/rapports, fixer les objectifs, attribuer les
+ * taches) sans que son badge de role change.
+ */
+const ELEVATED_USER_EMAILS: Record<string, Role> = {
+  'alhassane98toure@gmail.com': 'ceo',
+}
+
+/** Role a utiliser pour les checks de permissions (peut differer du role affiche). */
+export function getEffectiveRole(profile: { role?: string | null; email?: string | null } | null | undefined): string | null {
+  const email = profile?.email?.toLowerCase().trim()
+  if (email && ELEVATED_USER_EMAILS[email]) return ELEVATED_USER_EMAILS[email]
+  return profile?.role || null
+}

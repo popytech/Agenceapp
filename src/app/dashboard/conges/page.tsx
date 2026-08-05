@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
+import { getEffectiveRole } from '@/lib/permissions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -126,7 +127,7 @@ export default function CongesPage() {
   const [editing, setEditing] = useState<Leave | null>(null)
   const [form, setForm] = useState(EMPTY)
   const [saving, setSaving] = useState(false)
-  const isAdmin = ['super_admin', 'ceo', 'chef_projet', 'assistante_direction'].includes(profile?.role || '')
+  const isAdmin = ['super_admin', 'ceo', 'chef_projet', 'assistante_direction'].includes(getEffectiveRole(profile) || '')
 
   const fetchAll = useCallback(async () => {
     setLoading(true)

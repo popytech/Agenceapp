@@ -7,7 +7,7 @@ import {
   Lightbulb, FileText, Camera, Upload, BarChart2, Library,
   Plus, X, Check, Clock, AlertCircle, Pen, Film, Mic, Image,
   CheckCircle2, Send, ThumbsUp, MessageSquare, RefreshCw,
-  Flame, TrendingUp, Eye, AlertTriangle, Bell
+  Flame, TrendingUp, Eye, AlertTriangle, Bell, Trash2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format, isToday, isBefore, startOfDay, parseISO } from 'date-fns'
@@ -535,6 +535,12 @@ function ModuleIdeation({ ideas, onAdd, onUpdate, onOpenScript, projects, client
     onUpdate()
   }
 
+  async function deleteIdea(id: string) {
+    if (!confirm('Supprimer cette idée ? Le script et la production associés seront aussi supprimés.')) return
+    await supabase.from('content_ideas').delete().eq('id', id)
+    onUpdate()
+  }
+
   return (
     <div className="space-y-5">
       {showAdd && <AddIdeaModal onClose={() => setShowAdd(false)} onSaved={() => { setShowAdd(false); onUpdate() }} projects={projects} clients={clients} />}
@@ -608,6 +614,9 @@ function ModuleIdeation({ ideas, onAdd, onUpdate, onOpenScript, projects, client
                     <select value={idea.idea_status || 'brouillon'} onChange={e => updateIdeaStatus(idea.id, e.target.value)} className="text-xs bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1 text-gray-600 dark:text-white/50 focus:outline-none">
                       {IDEA_STATUSES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
                     </select>
+                    <button onClick={() => deleteIdea(idea.id)} className="text-xs p-1 bg-gray-100 dark:bg-white/5 hover:bg-red-100 dark:hover:bg-red-500/10 rounded-lg text-gray-600 dark:text-white/50 hover:text-red-600 dark:hover:text-red-400 transition-all">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
               </div>

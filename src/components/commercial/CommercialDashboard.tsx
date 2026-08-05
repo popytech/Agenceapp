@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
+import { isAdmin, getEffectiveRole } from '@/lib/permissions'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer
@@ -289,7 +290,7 @@ export default function CommercialDashboard() {
       async function load() {
         if (!profile?.id) return
         const today = format(new Date(), 'yyyy-MM-dd')
-        const isSuperAdmin = profile.role === 'super_admin'
+        const isSuperAdmin = isAdmin(getEffectiveRole(profile))
 
         let leadsQuery = supabase.from('sales_leads').select('id,company_name,contact_name,status,score,estimated_budget,urgency,decision_level,source,need,notes,assigned_to,created_at,updated_at')
           let meetingsQuery = supabase.from('meetings').select('id,title,status,type,scheduled_at,duration_min,meet_link,notes,outcome,summary,sales_lead_id,lead_id')

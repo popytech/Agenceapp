@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { safeChannel } from '@/lib/realtime'
 import { useAuth } from '@/lib/auth-context'
-import { getPermissions, isChefProjetOrAbove } from '@/lib/permissions'
+import { getPermissions, isChefProjetOrAbove, getEffectiveRole } from '@/lib/permissions'
 import { toast } from 'sonner'
 
 function getErrorMessage(error: any, fallback: string) {
@@ -201,7 +201,7 @@ function KanbanBoard({ filtered, onEdit, onDelete, onStatusChange, onViewDetail,
 
 export default function TasksPage() {
   const { profile, user } = useAuth()
-  const perms = getPermissions(profile?.role)
+  const perms = getPermissions(getEffectiveRole(profile))
 
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Project[]>([])
@@ -217,7 +217,7 @@ export default function TasksPage() {
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
 
-  const isManager = isChefProjetOrAbove(profile?.role)
+  const isManager = isChefProjetOrAbove(getEffectiveRole(profile))
   const canAssign = perms?.canAssignTask ?? isManager
 
   // Charger les membres dès que user est connu (indépendamment du profil)

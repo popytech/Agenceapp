@@ -11,7 +11,8 @@ function getErrorMessage(error: any, fallback: string) {
 import {
   Plus, Search, BookOpen, Clock, Users, Edit, Trash2,
   ChevronDown, ChevronUp, Eye, EyeOff, GraduationCap,
-  TrendingUp, CheckCircle2, PlayCircle, BarChart3, UserPlus, Award
+  TrendingUp, CheckCircle2, PlayCircle, BarChart3, UserPlus, Award,
+  Link2, Copy, X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -86,6 +87,9 @@ export default function AcademyPage() {
   const [enrollForm, setEnrollForm]     = useState(emptyEnrollForm)
   const [saving, setSaving]             = useState(false)
   const [activeTab, setActiveTab]       = useState('catalogue')
+  const [formDialog, setFormDialog]     = useState<any | null>(null)
+  const [formFields, setFormFields]     = useState<{ key: string; label: string; type: string; required: boolean }[]>([])
+  const [newField, setNewField]         = useState({ label: '', type: 'text', required: false })
 
   // Academy (Gestion des inscrits) et Formations (Sessions & Formateurs)
   // lisent/ecrivent maintenant la meme table - plus de doublon de donnees.
@@ -147,6 +151,40 @@ export default function AcademyPage() {
     if (!confirm('Supprimer cette formation ?')) return
     await supabase.from('trainings').delete().eq('id', id)
     toast.success('Formation supprimée'); fetchAll()
+  }
+
+  function openFormDialog(training: any) {
+    setFormDialog(training)
+    setFormFields(training.custom_fields || [])
+    setNewField({ label: '', type: 'text', required: false })
+  }
+
+  function addFormField() {
+    if (!newField.label.trim()) return
+    const key = newField.label.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
+    setFormFields(f => [...f, { key: key || `champ_${f.length + 1}`, label: newField.label.trim(), type: newField.type, required: newField.required }])
+    setNewField({ label: '', type: 'text', required: false })
+  }
+
+  function removeFormField(key: string) {
+    setFormFields(f => f.filter(x => x.key !== key))
+  }
+
+  async function saveFormFields() {
+    if (!formDialog) return
+    setSaving(true)
+    const { error } = await supabase.from('trainings').update({ custom_fields: formFields }).eq('id', formDialog.id)
+    setSaving(false)
+    if (error) { toast.error(getErrorMessage(error, 'Enregistrement impossible')); return }
+    toast.success('Formulaire mis à jour')
+    fetchAll()
+    setFormDialog(null)
+  }
+
+  function copyRegistrationLink(trainingId: string) {
+    const url = `${window.location.origin}/inscription/${trainingId}`
+    navigator.clipboard.writeText(url)
+    toast.success('Lien copié dans le presse-papiers')
   }
 
   async function togglePublish(training: any) {
@@ -325,6 +363,9 @@ export default function AcademyPage() {
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setModuleDialog(training); fetchModules(training.id) }}>
                               <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Formulaire & lien d'inscription" onClick={() => openFormDialog(training)}>
+                              <Link2 className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(training)}><Edit className="h-4 w-4" /></Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(training.id)}><Trash2 className="h-4 w-4" /></Button>
@@ -570,6 +611,69 @@ export default function AcademyPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setModuleDialog(null)}>Fermer</Button>
             <Button onClick={handleAddModule} disabled={saving}>{saving ? 'Ajout...' : 'Ajouter le module'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Dialog: Formulaire d'inscription & lien public ── */}
+      <Dialog open={!!formDialog} onOpenChange={(v) => !v && setFormDialog(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Formulaire & lien d'inscription — {formDialog?.title}</DialogTitle></DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="space-y-2">
+              <Label>Lien public à partager</Label>
+              <div className="flex gap-2">
+                <Input readOnly value={formDialog ? `${typeof window !== 'undefined' ? window.location.origin : ''}/inscription/${formDialog.id}` : ''} className="text-xs" />
+                <Button type="button" variant="outline" size="icon" onClick={() => formDialog && copyRegistrationLink(formDialog.id)}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {formDialog?.is_published ? 'Formation publiée : le lien est actif.' : 'Formation en brouillon : publiez-la pour que le lien fonctionne.'}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Champs personnalisés du formulaire</Label>
+              <p className="text-xs text-muted-foreground">Nom, email, téléphone et entreprise sont déjà inclus par défaut. Ajoutez ici des questions spécifiques à cette formation.</p>
+              {formFields.length > 0 && (
+                <div className="space-y-2">
+                  {formFields.map((f) => (
+                    <div key={f.key} className="flex items-center gap-2 border rounded-lg px-3 py-2">
+                      <span className="flex-1 text-sm">{f.label}</span>
+                      <Badge variant="outline" className="text-xs">{f.type}</Badge>
+                      {f.required && <Badge variant="outline" className="text-xs">requis</Badge>}
+                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeFormField(f.key)}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-end gap-2 pt-2 border-t">
+                <div className="flex-1 space-y-1">
+                  <Label className="text-xs">Libellé de la question</Label>
+                  <Input placeholder="Ex: Dernier diplôme obtenu" value={newField.label} onChange={e => setNewField(f => ({ ...f, label: e.target.value }))} />
+                </div>
+                <div className="w-32 space-y-1">
+                  <Label className="text-xs">Type</Label>
+                  <Select value={newField.type} onValueChange={v => setNewField(f => ({ ...f, type: v }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="text">Texte</SelectItem>
+                      <SelectItem value="email">Email</SelectItem>
+                      <SelectItem value="tel">Téléphone</SelectItem>
+                      <SelectItem value="textarea">Texte long</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="button" variant="outline" onClick={addFormField}>Ajouter</Button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFormDialog(null)}>Annuler</Button>
+            <Button onClick={saveFormFields} disabled={saving}>{saving ? 'Enregistrement...' : 'Enregistrer'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

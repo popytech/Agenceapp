@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getPermissions } from '@/lib/permissions'
+import { getPermissions, getEffectiveRole } from '@/lib/permissions'
 import {
   Globe, Star, MessageSquare, TrendingUp, Plus, X,
   Instagram, Facebook, Youtube, Linkedin, Eye,
@@ -583,7 +583,7 @@ export default function CommunityPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const permissions = profile ? getPermissions(profile.role) : null
+  const permissions = profile ? getPermissions(getEffectiveRole(profile)) : null
   if (!loading && permissions && !permissions.canViewCommunity) {
     return <div className="flex items-center justify-center h-64 text-muted-foreground">Accès non autorisé</div>
   }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
+import { getEffectiveRole } from '@/lib/permissions'
 import { formatGNF } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -128,7 +129,7 @@ export default function PortalPage() {
   const [detailOpen, setDetailOpen]         = useState(false)
   const [activeTab, setActiveTab]           = useState('clients')
 
-  const isAdmin = ['super_admin', 'ceo', 'chef_projet', 'assistante_direction', 'commercial_digital'].includes(profile?.role || '')
+  const isAdmin = ['super_admin', 'ceo', 'chef_projet', 'assistante_direction', 'commercial_digital'].includes(getEffectiveRole(profile) || '')
 
   const fetchAll = useCallback(async () => {
     setLoading(true)

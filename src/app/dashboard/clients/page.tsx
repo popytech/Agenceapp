@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase, Client } from '@/lib/supabase'
 import { cacheSet, cacheInvalidate } from '@/lib/cache'
 import { useAuth } from '@/lib/auth-context'
-import { getPermissions } from '@/lib/permissions'
+import { getPermissions, getEffectiveRole } from '@/lib/permissions'
 import { toast } from 'sonner'
 
 function getErrorMessage(error: any, fallback: string) {
@@ -199,7 +199,7 @@ function ClientDocumentsSection({ clientDocs, loadingDocs, uploadingDoc, docForm
 
 export default function ClientsPage() {
   const { profile } = useAuth()
-  const perms = getPermissions(profile?.role)
+  const perms = getPermissions(getEffectiveRole(profile))
   const [clients, setClients] = useState<Client[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<string>('all')

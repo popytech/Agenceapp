@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
-import { getPermissions } from '@/lib/permissions'
+import { getPermissions, getEffectiveRole } from '@/lib/permissions'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import CommercialDashboard from '@/components/commercial/CommercialDashboard'
@@ -9,7 +9,7 @@ import CommercialDashboard from '@/components/commercial/CommercialDashboard'
 export default function CommercialPage() {
   const { profile } = useAuth()
   const router = useRouter()
-  const perms = profile ? getPermissions(profile.role) : null
+  const perms = profile ? getPermissions(getEffectiveRole(profile)) : null
 
   useEffect(() => {
     if (profile && perms && !perms.canViewCommercial) {

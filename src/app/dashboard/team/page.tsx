@@ -21,7 +21,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
-import { isAdmin } from '@/lib/permissions'
+import { isAdmin, getEffectiveRole } from '@/lib/permissions'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 const roleConfig: Record<string, { label: string; color: string; bg: string; dot: string; gradient: string; tier: number }> = {
@@ -92,7 +92,7 @@ function AnimatedCounter({ value, duration = 800 }: { value: number; duration?: 
 
 export default function TeamPage() {
   const { profile: currentProfile } = useAuth()
-  const canManage = isAdmin(currentProfile?.role)
+  const canManage = isAdmin(getEffectiveRole(currentProfile))
   const isSuperAdmin = currentProfile?.role === 'super_admin'
 
   const [team, setTeam] = useState<MemberWithWorkload[]>([])
