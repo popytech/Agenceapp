@@ -289,7 +289,7 @@ export default function AcademyPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-9 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         {[
           { label: 'Formations',   value: stats.formations,              icon: BookOpen,     color: 'text-foreground' },
           { label: 'Publiées',     value: stats.published,               icon: Eye,          color: 'text-emerald-600' },
@@ -301,7 +301,7 @@ export default function AcademyPage() {
           <Card key={k.label}>
             <CardContent className="pt-3 pb-3">
               <p className="text-xs text-muted-foreground flex items-center gap-1"><k.icon className="h-3 w-3" />{k.label}</p>
-              <p className={`text-lg font-black mt-0.5 ${k.color}`}>{k.value}</p>
+              <p className={`text-lg font-black mt-0.5 truncate ${k.color}`}>{k.value}</p>
             </CardContent>
           </Card>
         ))}

@@ -532,7 +532,7 @@ function TicketsTab({ tickets, allTickets, statusFilter, setStatusFilter, onStat
   return (
     <div className="space-y-5">
       {/* Pipeline KPI */}
-      <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+      <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
         {['all', ...TICKET_STATUSES.map(s => s.value)].map(s => {
           const cfg = TICKET_STATUSES.find(x => x.value === s)
           const count = s === 'all' ? allTickets.length : allTickets.filter((t: any) => t.status === s).length
