@@ -1,4 +1,4 @@
-const CACHE_NAME = 'popytech-v1';
+const CACHE_NAME = 'popytech-v2';
 const STATIC_ASSETS = [
   '/',
   '/dashboard',
@@ -51,19 +51,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first pour les assets statiques
+  // Network-first pour le JS/CSS : un cache-first sur ces fichiers peut
+  // servir indefiniment une vieille version apres un deploiement, sans
+  // aucune erreur visible (surtout genant sur une PWA installee, ou un
+  // Ctrl+F5 classique ne vide pas ce cache). On ne retombe sur le cache
+  // que si le reseau echoue vraiment (offline).
   if (
     url.pathname.match(/\.(png|jpg|svg|ico|woff2|css|js)$/)
   ) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached) return cached;
-        return fetch(request).then((res) => {
+      fetch(request)
+        .then((res) => {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           return res;
-        });
-      })
+        })
+        .catch(() => caches.match(request))
     );
   }
 });

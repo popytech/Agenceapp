@@ -98,6 +98,16 @@ export default function RootLayout({
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js');
                 });
+                // Le nouveau SW prend le controle immediatement (skipWaiting +
+                // clients.claim cote sw.js) ; on recharge une fois pour que la
+                // fenetre deja ouverte (surtout la PWA installee) recupere le
+                // code frais au lieu de rester bloquee sur l'ancien.
+                let refreshed = false;
+                navigator.serviceWorker.addEventListener('controllerchange', function() {
+                  if (refreshed) return;
+                  refreshed = true;
+                  window.location.reload();
+                });
               }
             `
           }}
