@@ -621,7 +621,7 @@ export default function TasksPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-4 gap-1 text-center">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 text-center">
                       {[
                         { label: 'À faire', count: todo.length, color: 'text-muted-foreground' },
                         { label: 'En cours', count: inProgress.length, color: 'text-blue-500' },

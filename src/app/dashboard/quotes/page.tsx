@@ -276,8 +276,8 @@ export default function QuotesPage() {
                       </Button>
                     </div>
                   </div>
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="border rounded-lg overflow-x-auto">
+                  <table className="w-full text-sm min-w-[480px]">
                     <thead className="bg-muted">
                       <tr>
                         <th className="text-left p-2 font-medium">Description</th>
@@ -520,8 +520,8 @@ export default function QuotesPage() {
               {selectedQuote.items?.length > 0 && (
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Prestations</p>
-                  <div className="border rounded-lg overflow-hidden text-sm">
-                    <table className="w-full">
+                  <div className="border rounded-lg overflow-x-auto text-sm">
+                    <table className="w-full min-w-[420px]">
                       <thead className="bg-muted">
                         <tr>
                           <th className="text-left p-2 font-medium">Description</th>

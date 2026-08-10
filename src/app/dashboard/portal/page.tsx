@@ -218,7 +218,7 @@ export default function PortalPage() {
       {/* ── Tabs ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
-          <TabsList>
+          <TabsList className="flex-wrap h-auto gap-1">
             <TabsTrigger value="clients" className="flex items-center gap-1.5">
               <Users className="h-3.5 w-3.5" /> Clients
             </TabsTrigger>
@@ -291,7 +291,7 @@ export default function PortalPage() {
                           )}
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-border">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4 pt-3 border-t border-border">
                         <div className="text-center">
                           <p className="text-lg font-bold">{cProjects.length}</p>
                           <p className="text-xs text-muted-foreground">Projets</p>
@@ -525,7 +525,7 @@ export default function PortalPage() {
                 </div>
 
                 {/* Financial summary */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <Card>
                     <CardContent className="pt-3 pb-3">
                       <p className="text-xs text-muted-foreground">Total facturé</p>

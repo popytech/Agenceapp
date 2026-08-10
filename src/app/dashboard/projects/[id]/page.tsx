@@ -245,7 +245,7 @@ export default function ProjectDetailPage() {
         })()}
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {columns.map(col => (
             <Card key={col.key} className="border-border/50">
               <CardContent className="p-3 text-center">
@@ -471,7 +471,7 @@ export default function ProjectDetailPage() {
               <Label>Description</Label>
               <Textarea placeholder="Détails..." rows={3} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label>Priorité</Label>
                 <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v as Task['priority'] }))}>

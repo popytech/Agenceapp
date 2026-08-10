@@ -595,7 +595,7 @@ export default function ProjectsPage() {
                 className="resize-none"
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {[
                 { label: 'Début', key: 'start_date', type: 'date' },
                 { label: 'Échéance', key: 'end_date', type: 'date' },

@@ -597,7 +597,8 @@ Utilise des prix en GNF (francs guinéens), entre 200 000 et 2 000 000 GNF par l
                     </Button>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="overflow-x-auto -mx-1 px-1">
+                  <div className="space-y-2 min-w-[560px]">
                     {/* Header colones */}
                     <div className="grid grid-cols-12 gap-2 text-xs text-muted-foreground px-1">
                       <span className="col-span-5">Description</span>
@@ -643,6 +644,7 @@ Utilise des prix en GNF (francs guinéens), entre 200 000 et 2 000 000 GNF par l
                     <Button variant="outline" size="sm" onClick={addItem} className="w-full gap-2 border-dashed mt-1">
                       <Plus className="h-3.5 w-3.5" /> Ajouter une ligne
                     </Button>
+                  </div>
                   </div>
                 </div>
 
@@ -873,7 +875,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
         <Card className="border-border/50">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground mb-1">Total encaissé</p>
@@ -896,7 +898,7 @@ export default function InvoicesPage() {
 
       {/* Onglets Factures / Reçus */}
       <Tabs defaultValue="factures">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 flex-wrap h-auto gap-1">
           <TabsTrigger value="factures" className="gap-2">
             <Receipt className="h-4 w-4" /> Factures
           </TabsTrigger>

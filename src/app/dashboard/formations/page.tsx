@@ -572,7 +572,7 @@ function FormateursTab({ profiles, sessions, enrollments, feedbacks }: {
                     </div>
 
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
                   <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-bold">{trainerSessions.length}</p>
                     <p className="text-xs text-muted-foreground">Sessions</p>
@@ -803,7 +803,7 @@ function ApprenantsTab({ enrollments, sessions, trainings, registrations, profil
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b">
@@ -1249,7 +1249,7 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
             {previewTab === 'avant' ? (
               <>
                 {/* Sélecteur template */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {templateOptions.map(t => (
                     <button
                       key={t.id}
@@ -1375,7 +1375,7 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
                       />
                     </div>
                     {/* Sélecteur template en bas aussi */}
-                    <div className="grid grid-cols-3 gap-2 mt-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
                       {templateOptions.map(t => (
                         <button
                           key={t.id}
@@ -1648,7 +1648,7 @@ function InscriptionsTab({ registrations, trainings, sessions, payments, reload 
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <KpiCard title="Total inscriptions" value={registrations.length} icon={UserPlus} color="bg-violet-500" />
         <KpiCard title="Montant collecté" value={totalPaid.toLocaleString('fr-FR') + ' GNF'} icon={DollarSign} color="bg-emerald-500" />
         <KpiCard title="Impayés / Partiels" value={unpaid} icon={AlertTriangle} color="bg-orange-500" />
@@ -1927,7 +1927,7 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
         </DialogContent>
       </Dialog>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <KpiCard title="Total paiements" value={payments.length} icon={Receipt} color="bg-emerald-500" />
         <KpiCard title="Encaissé aujourd'hui" value={totalToday.toLocaleString('fr-FR') + ' GNF'} icon={CreditCard} color="bg-blue-500" />
         <KpiCard title="Encaissé ce mois" value={totalMonth.toLocaleString('fr-FR') + ' GNF'} icon={DollarSign} color="bg-violet-500" />
@@ -2009,7 +2009,7 @@ function PaiementsTab({ payments, registrations, trainings, reload }: {
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b">

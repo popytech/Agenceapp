@@ -89,7 +89,7 @@ export default function InternsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {Object.entries(statusConfig).map(([key, { label }]) => (
           <Card key={key} className="border-border/50">
             <CardContent className="p-4 text-center">

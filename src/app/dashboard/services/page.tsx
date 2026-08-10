@@ -731,7 +731,7 @@ function PacksTab({ packs, services, loading, onReload }: {
             {suggestedPrice > 0 && (
               <div className="bg-[#6A00FF]/5 border border-[#6A00FF]/20 rounded-xl p-4">
                 <p className="text-xs font-semibold text-[#6A00FF] mb-3">Calcul automatique</p>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
                   <div><p className="text-[10px] text-muted-foreground mb-1">Valeur services</p><p className="font-bold">{formatGNF(suggestedPrice)}</p></div>
                   <div><p className="text-[10px] text-muted-foreground mb-1">Après remise {form.discount_percent}%</p><p className="font-bold text-[#6A00FF]">{formatGNF(discountedPrice)}</p></div>
                   <div><p className="text-[10px] text-muted-foreground mb-1">Économie client</p><p className="font-bold text-emerald-400">{formatGNF(suggestedPrice - discountedPrice)}</p></div>

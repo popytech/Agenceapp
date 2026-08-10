@@ -501,7 +501,7 @@ export default function TeamPage() {
                     <div className="my-3 h-px bg-border/50" />
 
                     {/* Stats */}
-                    <div className="grid grid-cols-3 gap-2 mb-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                       {[
                         { label: 'Actives', value: member.activeTasksCount },
                         { label: 'Complétées', value: member.completedTasksCount },
@@ -649,7 +649,7 @@ export default function TeamPage() {
                     </div>
 
                     {/* Stats 4 colonnes */}
-                    <div className="grid grid-cols-4 gap-2 mb-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                       {[
                         { label: 'Actives',  value: selectedMember.activeTasksCount,   color: w.color },
                         { label: 'Total',    value: selectedMember.totalTasksCount,     color: 'text-foreground' },

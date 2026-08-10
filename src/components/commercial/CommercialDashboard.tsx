@@ -1051,7 +1051,7 @@ export default function CommercialDashboard() {
               <Input placeholder="+224 xxx xxx xxx" value={leadForm.contact_phone} onChange={e => setLeadForm(f => ({...f, contact_phone: e.target.value}))} />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
               <Label className="text-xs">Source</Label>
               <Select value={leadForm.source} onValueChange={v => setLeadForm(f => ({...f, source: v}))}>

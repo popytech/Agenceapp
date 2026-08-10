@@ -963,7 +963,7 @@ export default function DesignerPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="tasks">
-        <TabsList className="bg-[#111] border border-white/5">
+        <TabsList className="bg-[#111] border border-white/5 flex-wrap h-auto gap-1">
           <TabsTrigger value="tasks" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-gray-400 gap-2">
             <Layers size={14} />Tâches
             {tasks.filter(t => !['validated','delivered'].includes(t.status)).length > 0 && (
