@@ -515,6 +515,7 @@ function getNavGroups(role: string | null | undefined, isAdminViewingMetier: boo
             { href: '/dashboard/stock', label: 'Stock & Inventaire', icon: Package },
             { href: '/dashboard/team', label: 'Équipe', icon: Users },
             { href: '/dashboard/interns', label: 'Stagiaires', icon: UserCheck },
+            { href: '/dashboard/formations', label: 'Formations & Inscriptions', icon: GraduationCap },
           ],
         },
         {
