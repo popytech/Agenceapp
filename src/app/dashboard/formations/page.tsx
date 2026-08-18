@@ -914,60 +914,91 @@ function isIssuedCertificate(status: string | null | undefined) {
   return ISSUED_CERT_STATUSES.has((status || '').toLowerCase())
 }
 
-function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateStr, template }: {
+function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateStr, template, signatoryName, signatoryRole }: {
   studentName: string; trainingTitle: string; certNum: string; dateStr: string; template: CertTemplate
+  signatoryName?: string; signatoryRole?: string
 }) {
+  const role = signatoryRole || 'La Responsable de la Formation'
+
   if (template === 'classique') return (
-    <div className="relative w-full aspect-[297/210] bg-white rounded border-4 border-blue-900 flex flex-col items-center justify-center p-4 overflow-hidden select-none">
-      <div className="absolute inset-1.5 border border-blue-900 rounded pointer-events-none" />
-      <p className="text-[8px] font-bold tracking-widest text-blue-900 uppercase mb-1">Popytech Academy</p>
-      <div className="w-16 h-px bg-blue-900 mb-2" />
-      <p className="text-xl font-bold text-blue-900 mb-1">Certificat de Réussite</p>
-      <p className="text-[9px] text-slate-500 mb-1">Ce certificat est décerné à</p>
-      <p className="text-base font-bold italic text-blue-900 mb-0.5">{studentName}</p>
-      <div className="w-20 h-px bg-blue-900 mb-1.5" />
-      <p className="text-[9px] text-slate-600 mb-0.5">pour avoir complété avec succès la formation</p>
-      <p className="text-[10px] font-bold text-blue-900 text-center px-4">{trainingTitle}</p>
-      <div className="mt-2 bg-blue-900 text-white text-[8px] font-bold px-3 py-0.5 rounded">✓ CERTIFIÉ</div>
-      <div className="absolute bottom-2 left-0 right-0 flex justify-between px-4 text-[7px] text-slate-400">
-        <span>N° {certNum}</span><span>{dateStr}</span><span>contact@popytech.com</span>
+    // Inspiré : cadre or & marine, médaillon, titre imposant
+    <div className="relative w-full aspect-[297/210] flex flex-col items-center p-4 pt-3 overflow-hidden select-none"
+      style={{ background: '#FDFAF0', border: '3px solid #B48C2D' }}>
+      <div className="absolute inset-[7px] border border-[#101A40] pointer-events-none" />
+      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold mt-1"
+        style={{ background: '#101A40', color: '#B48C2D', border: '1.5px solid #B48C2D' }}>PA</div>
+      <p className="text-[8px] font-bold tracking-widest text-[#101A40] uppercase mt-1.5">Popytech Academy</p>
+      <p className="text-[7px] font-bold uppercase tracking-tight text-slate-900 mt-2.5 text-center">Certificat de Formation</p>
+      <div className="w-16 h-px bg-[#B48C2D] mt-1 mb-1.5" />
+      <p className="text-[8px] text-slate-500">Ce certificat est décerné à :</p>
+      <p className="text-base font-bold italic text-[#101A40] mt-0.5" style={{ fontFamily: 'Georgia, serif' }}>{studentName}</p>
+      <div className="w-20 h-px bg-[#B48C2D] mt-1 mb-1" />
+      <p className="text-[7.5px] text-slate-600">pour avoir complété avec succès la formation :</p>
+      <p className="text-[9px] font-bold text-[#101A40] text-center px-4">{trainingTitle}</p>
+      <div className="absolute bottom-2 left-3 text-[6.5px] text-slate-500 leading-tight">
+        <p>Fait le {dateStr}</p><p className="text-slate-400">N° {certNum}</p>
+      </div>
+      <div className="absolute bottom-2 right-3 text-[6.5px] text-right leading-tight">
+        {signatoryName && <p className="font-bold italic text-[#101A40]">{signatoryName}</p>}
+        <p className="text-slate-500 border-t border-[#B48C2D] pt-0.5 mt-0.5">{role}</p>
       </div>
     </div>
   )
+
   if (template === 'moderne') return (
+    // Inspiré : blocs géométriques sarcelle / marine / citron vert
     <div className="relative w-full aspect-[297/210] bg-white rounded overflow-hidden flex select-none">
-      <div className="w-[18%] bg-violet-600 flex items-end justify-center pb-3 shrink-0">
-        <p className="text-white text-[7px] font-bold tracking-widest" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>POPYTECH ACADEMY</p>
+      <div className="w-[31%] flex flex-col shrink-0">
+        <div className="h-[15%] bg-lime-400 flex items-center px-2">
+          <p className="text-[6px] font-bold text-slate-800">www.popytech.com</p>
+        </div>
+        <div className="h-[28%] bg-slate-800 flex flex-col justify-center px-2 gap-0.5">
+          <p className="text-[6px] text-lime-400">POPYTECH ACADEMY</p>
+          <p className="text-[9px] font-bold text-white leading-tight">Formation Certifiée</p>
+        </div>
+        <div className="h-[11%] bg-teal-600 flex items-center px-2">
+          <p className="text-[6.5px] font-bold text-white">#PopytechAcademy</p>
+        </div>
+        <div className="flex-1 bg-slate-50 px-2 py-1.5 flex flex-col justify-center gap-1">
+          <div><p className="text-[5.5px] font-bold text-slate-700">DATE</p><p className="text-[7px] text-slate-500">{dateStr}</p></div>
+          <div><p className="text-[5.5px] font-bold text-slate-700">N° CERTIFICAT</p><p className="text-[7px] text-slate-500">{certNum}</p></div>
+        </div>
       </div>
       <div className="flex-1 p-4 flex flex-col justify-center">
-        <p className="text-[8px] font-bold text-violet-600 tracking-widest uppercase mb-1">Certificat Officiel</p>
-        <p className="text-2xl font-bold text-slate-800 leading-tight">Certificat<br/>de Réussite</p>
-        <div className="w-12 h-1 bg-violet-600 my-2" />
+        <p className="text-2xl font-bold text-slate-800 leading-tight">Certificat<br/><span className="text-teal-600">de Réussite</span></p>
+        <div className="w-10 h-1 bg-lime-400 my-2" />
         <p className="text-[9px] text-slate-400 mb-1">Ce certificat est décerné à</p>
-        <p className="text-lg font-bold text-slate-700 mb-1">{studentName}</p>
+        <p className="text-lg font-bold text-teal-700 mb-1">{studentName}</p>
         <p className="text-[9px] text-slate-500">pour avoir complété avec succès :</p>
         <p className="text-[10px] font-bold text-slate-700">{trainingTitle}</p>
         <div className="mt-auto pt-3 flex gap-8 border-t border-slate-200 text-[7px]">
-          <div><p className="font-bold text-slate-700">{dateStr}</p><p className="text-slate-400">Date de délivrance</p></div>
-          <div><p className="font-bold text-slate-700">{certNum}</p><p className="text-slate-400">N° certificat</p></div>
+          <div><p className="font-bold text-slate-700">{signatoryName || '—'}</p><p className="text-slate-400">{role}</p></div>
+          <div><p className="font-bold text-slate-700">Popytech Academy</p><p className="text-slate-400">Direction Académique</p></div>
         </div>
       </div>
     </div>
   )
+
   return (
-    <div className="relative w-full aspect-[297/210] bg-slate-900 rounded overflow-hidden flex flex-col items-center justify-center p-4 select-none">
-      <div className="absolute top-3 left-3 text-[8px] font-bold text-violet-400 tracking-widest">POPYTECH ACADEMY</div>
-      <div className="absolute top-3 right-3 text-[7px] text-slate-500">N° {certNum}</div>
-      <div className="text-2xl text-yellow-400 mb-1">★</div>
-      <p className="text-[8px] font-bold text-violet-400 tracking-widest uppercase mb-1">Certification Officielle</p>
-      <p className="text-xl font-bold text-white mb-1">Excellence Award</p>
-      <p className="text-[9px] text-slate-400 mb-1">Ce certificat premium est décerné à</p>
-      <p className="text-base font-bold text-violet-300 mb-1">{studentName}</p>
-      <p className="text-[9px] text-slate-400">pour avoir maîtrisé avec excellence</p>
+    // Inspiré : ruban doré, sceau médaillon, fond bordeaux
+    <div className="relative w-full aspect-[297/210] rounded overflow-hidden flex flex-col items-center p-4 select-none"
+      style={{ background: '#2E0A18', border: '1px solid #B48C2D' }}>
+      <div className="absolute top-0 left-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '0 0 22px 22px', borderColor: 'transparent transparent transparent #B48C2D' }} />
+      <div className="absolute top-0 right-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '0 22px 22px 0', borderColor: 'transparent #B48C2D transparent transparent' }} />
+      <div className="absolute bottom-0 left-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '22px 0 0 22px', borderColor: 'transparent transparent transparent #B48C2D' }} />
+      <div className="absolute bottom-0 right-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '22px 22px 0 0', borderColor: '#B48C2D transparent transparent transparent' }} />
+      <div className="px-3 py-0.5 rounded-b text-[6.5px] font-bold" style={{ background: '#B48C2D', color: '#2E0A18' }}>POPYTECH ACADEMY — CERTIFICATION OFFICIELLE</div>
+      <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm mt-2" style={{ background: '#B48C2D', color: '#2E0A18' }}>★</div>
+      <p className="text-lg font-bold text-white mt-2">Certificat d'Excellence</p>
+      <div className="w-16 h-px mt-1 mb-1.5" style={{ background: '#B48C2D' }} />
+      <p className="text-[8px] mt-1" style={{ color: '#E6D2BE' }}>Ce certificat est décerné à</p>
+      <p className="text-base font-bold italic mt-0.5" style={{ color: '#D9B24C', fontFamily: 'Georgia, serif' }}>{studentName}</p>
+      <p className="text-[8px] mt-1.5 text-center" style={{ color: '#E6D2BE' }}>pour avoir maîtrisé avec excellence</p>
       <p className="text-[9px] font-bold text-white text-center">{trainingTitle}</p>
-      <div className="absolute bottom-0 left-0 right-0 border-t border-slate-700 flex justify-between px-4 py-1.5 text-[7px]">
-        <span className="text-slate-400">{dateStr}</span>
-        <span className="text-green-400 font-bold">Certifié ✓</span>
+      <div className="absolute bottom-2 left-0 right-0 flex justify-between px-4 text-[6.5px]" style={{ color: '#C9AA8C' }}>
+        <span>N° {certNum}</span>
+        <span>{dateStr}</span>
+        <span className="font-bold" style={{ color: '#D9B24C' }}>{signatoryName || role}</span>
       </div>
     </div>
   )
@@ -1086,6 +1117,8 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
       orgName:       'POPYTECH ACADEMY',
       contactEmail:  'contact@popytech.com',
       website:       'www.popytech.com',
+      signatoryName: '',
+      signatoryRole: 'La Responsable de la Formation',
     })
   }
 
@@ -1098,9 +1131,9 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
   const delivered = certifications.filter(c => isIssuedCertificate(c.status))
 
   const templateOptions: { id: CertTemplate; label: string; desc: string; icon: string }[] = [
-    { id: 'classique', label: 'Classique', desc: 'Sobre, cadre bleu marine', icon: '📜' },
-    { id: 'moderne', label: 'Moderne', desc: 'Violet & blanc élégant', icon: '🎨' },
-    { id: 'premium', label: 'Premium', desc: 'Dark gold prestige', icon: '⭐' },
+    { id: 'classique', label: 'Classique', desc: 'Cadre or & marine, médaillon', icon: '📜' },
+    { id: 'moderne', label: 'Moderne', desc: 'Blocs sarcelle & citron vert', icon: '🎨' },
+    { id: 'premium', label: 'Premium', desc: 'Ruban doré, sceau, bordeaux', icon: '⭐' },
   ]
 
     // Filter profiles to show only relevant persons (trainees, or already certified/enrolled)
@@ -1276,6 +1309,8 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
                       certNum={certPreview.cert.certificate_number || 'CERT-XXX'}
                       dateStr={new Date(certPreview.cert.issued_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       template={selectedTemplate}
+                      signatoryName={certOverrides.signatoryName}
+                      signatoryRole={certOverrides.signatoryRole}
                     />
                   </div>
                 )}
@@ -1356,6 +1391,24 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
                       placeholder="pour avoir complété avec succès la formation :"
                     />
                   </div>
+                  <div>
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Nom du/de la signataire</Label>
+                    <Input
+                      className="mt-1.5 rounded-xl"
+                      value={certOverrides.signatoryName || ''}
+                      onChange={e => setCertOverrides(o => ({ ...o, signatoryName: e.target.value }))}
+                      placeholder="Diarra Aminata Faousia"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Fonction du signataire</Label>
+                    <Input
+                      className="mt-1.5 rounded-xl"
+                      value={certOverrides.signatoryRole || ''}
+                      onChange={e => setCertOverrides(o => ({ ...o, signatoryRole: e.target.value }))}
+                      placeholder="La Responsable de la Formation"
+                    />
+                  </div>
                 </div>
 
                 {/* Aperçu avec modifications */}
@@ -1372,6 +1425,8 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
                           : new Date(certPreview.cert.issued_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
                         }
                         template={selectedTemplate}
+                        signatoryName={certOverrides.signatoryName}
+                        signatoryRole={certOverrides.signatoryRole}
                       />
                     </div>
                     {/* Sélecteur template en bas aussi */}

@@ -1415,9 +1415,22 @@ export function downloadFormationReceiptPDF(p: {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   CERTIFICAT FORMATION PDF — 3 templates Corporate Tech 2026
+   CERTIFICAT FORMATION PDF — 3 templates redesignés 2026
+   Classique : cadre or & marine, médaillon (inspiré parchemin/école de prestige)
+   Moderne   : blocs géométriques sarcelle / marine / citron vert
+   Premium   : ruban doré, sceau médaillon, fond bordeaux profond
 ═══════════════════════════════════════════════════════════════════════════════ */
 type CertificateTemplate = 'classique' | 'moderne' | 'premium'
+
+// Palette dédiée aux certificats (distincte de la palette corporate des autres documents)
+const CERT_GOLD:     [number,number,number] = [180, 140, 45]
+const CERT_NAVY:     [number,number,number] = [16,  26,  64]
+const CERT_CREAM:    [number,number,number] = [253, 250, 240]
+const CERT_TEAL:     [number,number,number] = [13, 148, 136]
+const CERT_TEAL_D:   [number,number,number] = [8,   95,  87]
+const CERT_LIME:     [number,number,number] = [163, 230, 53]
+const CERT_CHARCOAL: [number,number,number] = [30,  41,  59]
+const CERT_BURGUNDY: [number,number,number] = [46,  10,  24]
 
 export interface CertificateOverrides {
   studentName?: string
@@ -1429,6 +1442,8 @@ export interface CertificateOverrides {
   orgName?: string         // "POPYTECH ACADEMY"
   contactEmail?: string
   website?: string
+  signatoryName?: string   // ex: "Diarra Aminata Faousia"
+  signatoryRole?: string   // défaut: "La Responsable de la Formation"
 }
 
 export function downloadFormationCertificatePDF(cert: {
@@ -1448,6 +1463,8 @@ export function downloadFormationCertificatePDF(cert: {
   const resolvedMiddle  = overrides?.middle        || 'pour avoir complété avec succès la formation :'
   const resolvedMiddle2 = overrides?.middle        || 'pour avoir complété avec succès :'
   const resolvedMiddle3 = overrides?.middle        || 'pour avoir maîtrisé avec excellence la formation :'
+  const resolvedSignatory     = overrides?.signatoryName || ''
+  const resolvedSignatoryRole = overrides?.signatoryRole || 'La Responsable de la Formation'
 
   const dateStr = new Date(resolvedDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
   const num = resolvedNum
@@ -1456,250 +1473,309 @@ export function downloadFormationCertificatePDF(cert: {
   const W = 297; const H = 210; const M = 20
 
   if (template === 'classique') {
-    // ── Classique : blanc pur, bordure bleu néon, accents cyan
-    doc.setFillColor(...WHITE)
+    // ── Classique : cadre or & marine, médaillon, titre imposant (inspiré diplôme de prestige)
+    doc.setFillColor(...CERT_CREAM)
     doc.rect(0, 0, W, H, 'F')
 
-    // Double bordure bleue
-    doc.setDrawColor(...BLUE)
-    doc.setLineWidth(2.5)
-    doc.rect(8, 8, W - 16, H - 16)
-    doc.setLineWidth(0.5)
-    doc.rect(12, 12, W - 24, H - 24)
+    // Cadre extérieur or + cadre intérieur marine
+    doc.setDrawColor(...CERT_GOLD)
+    doc.setLineWidth(3)
+    doc.rect(7, 7, W - 14, H - 14)
+    doc.setDrawColor(...CERT_NAVY)
+    doc.setLineWidth(0.6)
+    doc.rect(11, 11, W - 22, H - 22)
 
-    // Coins cyan
-    const cs = 8
-    const corners: [number, number][] = [[8,8],[W-8-cs,8],[8,H-8-cs],[W-8-cs,H-8-cs]]
+    // Coins ornementaux or
+    const cs = 9
+    const corners: [number, number][] = [[7,7],[W-7-cs,7],[7,H-7-cs],[W-7-cs,H-7-cs]]
     corners.forEach(([cx, cy]) => {
-      doc.setFillColor(...CYAN)
+      doc.setFillColor(...CERT_GOLD)
       doc.rect(cx, cy, cs, cs, 'F')
+      doc.setFillColor(...CERT_CREAM)
+      doc.rect(cx + 2, cy + 2, cs - 4, cs - 4, 'F')
     })
 
+    // Médaillon logo centré
+    doc.setFillColor(...CERT_NAVY)
+    doc.circle(W / 2, 29, 9, 'F')
+    doc.setDrawColor(...CERT_GOLD)
+    doc.setLineWidth(0.8)
+    doc.circle(W / 2, 29, 9)
     doc.setFontSize(10)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE)
-    doc.text(resolvedOrg, W / 2, 32, { align: 'center' })
+    doc.setTextColor(...CERT_GOLD)
+    doc.text('PA', W / 2, 31.5, { align: 'center' })
 
-    // Trait cyan centre
-    doc.setFillColor(...CYAN)
-    doc.rect(W / 2 - 40, 35, 80, 1.5, 'F')
-
-    doc.setFontSize(30)
+    doc.setFontSize(9)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE_D)
-    doc.text('Certificat de Réussite', W / 2, 58, { align: 'center' })
-
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...SLATE)
-    doc.text(resolvedIntro, W / 2, 76, { align: 'center' })
-
-    doc.setFontSize(26)
-    doc.setFont('helvetica', 'bolditalic')
-    doc.setTextColor(...BLUE)
-    doc.text(resolvedName, W / 2, 94, { align: 'center' })
-    doc.setFillColor(...CYAN)
-    doc.rect(W / 2 - 55, 97, 110, 1.5, 'F')
-
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...SLATE)
-    doc.text(resolvedMiddle, W / 2, 110, { align: 'center' })
-    doc.setFontSize(15)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE_D)
-    const titleLines = doc.splitTextToSize(resolvedTitle, W - M * 4)
-    doc.text(titleLines, W / 2, 121, { align: 'center' })
-
-    // Badge certifié
-    doc.setFillColor(...BLUE)
-    doc.roundedRect(W / 2 - 26, 138, 52, 11, 3, 3, 'F')
-    doc.setFillColor(...CYAN)
-    doc.roundedRect(W / 2 - 26, 147, 52, 2, 1, 1, 'F')
-    doc.setFontSize(8.5)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...WHITE)
-    doc.text('CERTIFIE', W / 2, 145.5, { align: 'center' })
-
-    doc.setFontSize(8)
+    doc.setTextColor(...CERT_NAVY)
+    doc.text(resolvedOrg, W / 2, 46, { align: 'center' })
+    doc.setFontSize(6.5)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(...MUTED)
-    doc.text(`N° ${num}`, M + 10, H - 20)
-    doc.text(`Délivré le ${dateStr}`, W / 2, H - 20, { align: 'center' })
-    doc.text(resolvedEmail, W - M - 10, H - 20, { align: 'right' })
+    doc.text(resolvedSite, W / 2, 51, { align: 'center' })
+
+    doc.setFontSize(27)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...INK)
+    doc.text('CERTIFICAT DE FORMATION', W / 2, 67, { align: 'center' })
+    doc.setFillColor(...CERT_GOLD)
+    doc.rect(W / 2 - 45, 71, 90, 1, 'F')
+
+    doc.setFontSize(10.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...SLATE)
+    doc.text(resolvedIntro + ' :', W / 2, 84, { align: 'center' })
+
+    doc.setFontSize(23)
+    doc.setFont('times', 'bolditalic')
+    doc.setTextColor(...CERT_NAVY)
+    doc.text(resolvedName, W / 2, 99, { align: 'center' })
+    doc.setFillColor(...CERT_GOLD)
+    doc.rect(W / 2 - 55, 102, 110, 0.6, 'F')
+
+    doc.setFontSize(10.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...SLATE)
+    doc.text(resolvedMiddle, W / 2, 114, { align: 'center' })
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...CERT_NAVY)
+    const titleLines = doc.splitTextToSize(resolvedTitle, W - M * 4)
+    doc.text(titleLines, W / 2, 124, { align: 'center' })
+
+    doc.setFontSize(8.5)
+    doc.setFont('helvetica', 'italic')
+    doc.setTextColor(...MUTED)
+    doc.text('En foi de quoi, le présent certificat lui est délivré pour servir et valoir ce que de droit.', W / 2, 140, { align: 'center' })
+
+    // Bloc signature (bas gauche : lieu/date/N°, bas droite : responsable de formation)
+    const sigY = H - 28
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...SLATE)
+    doc.text(`Fait le ${dateStr}`, M + 8, sigY)
+    doc.setFontSize(7.5)
+    doc.setTextColor(...MUTED)
+    doc.text(`N° ${num}`, M + 8, sigY + 6)
+
+    doc.setDrawColor(...CERT_GOLD)
+    doc.setLineWidth(0.4)
+    doc.line(W - M - 62, sigY - 5, W - M - 6, sigY - 5)
+    if (resolvedSignatory) {
+      doc.setFontSize(10)
+      doc.setFont('times', 'bolditalic')
+      doc.setTextColor(...CERT_NAVY)
+      doc.text(resolvedSignatory, W - M - 34, sigY, { align: 'center' })
+    }
+    doc.setFontSize(7.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...MUTED)
+    doc.text(resolvedSignatoryRole, W - M - 34, sigY + 6, { align: 'center' })
 
   } else if (template === 'moderne') {
-    // ── Moderne : blanc, sidebar bleu + bande cyan
+    // ── Moderne : blocs géométriques sarcelle / marine / citron vert (inspiré design corporate flat)
+    const SIDE_W = 92
     doc.setFillColor(...WHITE)
     doc.rect(0, 0, W, H, 'F')
 
-    // Sidebar bleu
-    doc.setFillColor(...BLUE)
-    doc.rect(0, 0, 52, H, 'F')
-    // Bande cyan à droite de la sidebar
-    doc.setFillColor(...CYAN)
-    doc.rect(50, 0, 4, H, 'F')
-
-    // Fond bas légèrement teinté
-    doc.setFillColor(...OFF_WHITE)
-    doc.rect(54, H - 34, W - 54, 34, 'F')
-
-    // Texte sidebar vertical
-    doc.setFontSize(9)
+    // Bandeau citron vert (haut de la colonne gauche)
+    doc.setFillColor(...CERT_LIME)
+    doc.rect(0, 0, SIDE_W, 32, 'F')
+    doc.setFontSize(7.5)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CYAN)
-    doc.text(resolvedOrg, 26, H - 18, { align: 'center', angle: 90 })
+    doc.setTextColor(...CERT_CHARCOAL)
+    doc.text(resolvedSite, 10, 19)
 
-    const CX = 70
+    // Bloc identité marine
+    doc.setFillColor(...CERT_CHARCOAL)
+    doc.rect(0, 32, SIDE_W, 58, 'F')
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...CERT_LIME)
+    doc.text(resolvedOrg, 10, 48)
+    doc.setFontSize(15)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...WHITE)
+    const orgLines = doc.splitTextToSize('Formation Certifiée', SIDE_W - 20)
+    doc.text(orgLines, 10, 60)
 
+    // Bloc sarcelle (tag)
+    doc.setFillColor(...CERT_TEAL)
+    doc.rect(0, 90, SIDE_W, 24, 'F')
     doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CYAN)
-    doc.text('CERTIFICAT OFFICIEL DE RÉUSSITE', CX, 28)
+    doc.setTextColor(...WHITE)
+    doc.text('#PopytechAcademy', 10, 105)
 
-    doc.setFontSize(30)
+    // Bas colonne gauche : date + numéro
+    doc.setFillColor(...OFF_WHITE)
+    doc.rect(0, 114, SIDE_W, H - 114, 'F')
+    doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE_D)
-    doc.text('Certificat', CX, 50)
-    doc.text('de Réussite', CX, 66)
-
-    // Trait bleu
-    doc.setFillColor(...BLUE)
-    doc.rect(CX, 71, 55, 2, 'F')
-
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...MUTED)
-    doc.text(resolvedIntro, CX, 85)
-
-    doc.setFontSize(24)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE)
-    doc.text(resolvedName, CX, 100)
-
-    doc.setFontSize(11)
+    doc.setTextColor(...CERT_CHARCOAL)
+    doc.text('DATE', 10, 130)
+    doc.setFontSize(9)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(...SLATE)
-    doc.text(resolvedMiddle2, CX, 115)
+    doc.text(dateStr, 10, 136)
+    doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE_D)
-    const titleLines2 = doc.splitTextToSize(resolvedTitle, W - CX - M - 10)
-    doc.text(titleLines2, CX, 125)
-
-    const footY = H - 26
-    hLine(doc, CX, footY - 2, W - CX - M, RULE)
-
-    doc.setFontSize(8)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE_D)
-    doc.text(dateStr, CX, footY + 5)
+    doc.setTextColor(...CERT_CHARCOAL)
+    doc.text('N° CERTIFICAT', 10, 148)
+    doc.setFontSize(9)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...MUTED)
-    doc.text('Date de délivrance', CX, footY + 11)
+    doc.setTextColor(...SLATE)
+    doc.text(num, 10, 154)
 
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE_D)
-    doc.text(num, CX + 85, footY + 5)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...MUTED)
-    doc.text('N° certificat', CX + 85, footY + 11)
-
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...BLUE)
-    doc.text(resolvedSite, CX + 168, footY + 5)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...MUTED)
-    doc.text('Site officiel', CX + 168, footY + 11)
-
-  } else {
-    // ── Premium : fond bleu nuit profond, accents cyan
-    doc.setFillColor(...BLUE_D)
-    doc.rect(0, 0, W, H, 'F')
-
-    // Cadre cyan fin
-    doc.setDrawColor(...CYAN)
-    doc.setLineWidth(1)
-    doc.rect(10, 10, W - 20, H - 20)
-    doc.setLineWidth(0.3)
-    doc.rect(14, 14, W - 28, H - 28)
-
-    // Coins déco cyan
-    const cl = 12
-    const cornerDots: [number, number][] = [[10,10],[W-10-cl,10],[10,H-10-cl],[W-10-cl,H-10-cl]]
-    cornerDots.forEach(([cx, cy]) => {
-      doc.setFillColor(...CYAN)
-      doc.rect(cx, cy, cl, 1, 'F')
-      doc.rect(cx, cy, 1, cl, 'F')
-    })
-
-    // Symbole tech central
-    doc.setFontSize(24)
-    doc.setTextColor(...CYAN)
-    doc.text('◈', W / 2, 50, { align: 'center' })
-
-    doc.setFontSize(8.5)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CYAN)
-    doc.text(`${resolvedOrg} — CERTIFICATION OFFICIELLE`, W / 2, 64, { align: 'center' })
-
-    doc.setFillColor(...CYAN)
-    doc.rect(W / 2 - 50, 67, 100, 0.8, 'F')
+    // Colonne droite : contenu principal
+    const CX = SIDE_W + 18
 
     doc.setFontSize(28)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...WHITE)
-    doc.text('Excellence & Innovation', W / 2, 86, { align: 'center' })
+    doc.setTextColor(...CERT_CHARCOAL)
+    doc.text('Certificat', CX, 44)
+    doc.setTextColor(...CERT_TEAL)
+    doc.text('de Réussite', CX, 61)
 
-    doc.setFontSize(11)
+    doc.setFillColor(...CERT_LIME)
+    doc.rect(CX, 67, 32, 2.2, 'F')
+
+    doc.setFontSize(10.5)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(160, 190, 230)
-    doc.text(resolvedIntro, W / 2, 102, { align: 'center' })
+    doc.setTextColor(...MUTED)
+    doc.text(resolvedIntro, CX, 82)
 
-    doc.setFontSize(24)
+    doc.setFontSize(22)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CYAN)
-    doc.text(resolvedName, W / 2, 118, { align: 'center' })
+    doc.setTextColor(...CERT_TEAL_D)
+    doc.text(resolvedName, CX, 96)
 
-    doc.setFillColor(...CYAN)
-    doc.rect(W / 2 - 55, 121, 110, 0.8, 'F')
-
-    doc.setFontSize(11)
+    doc.setFontSize(10.5)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(190, 215, 240)
-    doc.text(resolvedMiddle3, W / 2, 133, { align: 'center' })
+    doc.setTextColor(...SLATE)
+    doc.text(resolvedMiddle2, CX, 110)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...CERT_CHARCOAL)
+    const titleLines2 = doc.splitTextToSize(resolvedTitle, W - CX - M)
+    doc.text(titleLines2, CX, 119)
+
+    // Footer : deux signatures (Responsable de Formation + Direction Académique)
+    const footY = H - 28
+    hLine(doc, CX, footY - 4, 75, RULE)
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...CERT_CHARCOAL)
+    doc.text(resolvedSignatory || '—', CX, footY + 6)
+    doc.setFontSize(7.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...MUTED)
+    doc.text(resolvedSignatoryRole, CX, footY + 12)
+
+    const CX2 = CX + 92
+    hLine(doc, CX2, footY - 4, 75, RULE)
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...CERT_CHARCOAL)
+    doc.text(resolvedOrg, CX2, footY + 6)
+    doc.setFontSize(7.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...MUTED)
+    doc.text('Direction Académique', CX2, footY + 12)
+
+  } else {
+    // ── Premium : ruban doré, sceau médaillon, fond bordeaux (inspiré certificat d'excellence)
+    doc.setFillColor(...CERT_BURGUNDY)
+    doc.rect(0, 0, W, H, 'F')
+
+    // Triangles décoratifs dorés aux 4 coins (effet ruban en couches)
+    const dOuter = 36; const dInner = 25
+    doc.setFillColor(...CERT_GOLD)
+    doc.triangle(0, 0, dOuter, 0, 0, dOuter, 'F')
+    doc.triangle(W, 0, W - dOuter, 0, W, dOuter, 'F')
+    doc.triangle(0, H, dOuter, H, 0, H - dOuter, 'F')
+    doc.triangle(W, H, W - dOuter, H, W, H - dOuter, 'F')
+    doc.setFillColor(...CERT_BURGUNDY)
+    doc.triangle(0, 0, dInner, 0, 0, dInner, 'F')
+    doc.triangle(W, 0, W - dInner, 0, W, dInner, 'F')
+    doc.triangle(0, H, dInner, H, 0, H - dInner, 'F')
+    doc.triangle(W, H, W - dInner, H, W, H - dInner, 'F')
+
+    // Cadre fin doré
+    doc.setDrawColor(...CERT_GOLD)
+    doc.setLineWidth(0.4)
+    doc.rect(14, 14, W - 28, H - 28)
+
+    // Bandeau ruban doré en haut
+    doc.setFillColor(...CERT_GOLD)
+    doc.rect(W / 2 - 58, 0, 116, 11, 'F')
+    doc.setFontSize(8.5)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...CERT_BURGUNDY)
+    doc.text(`${resolvedOrg} — CERTIFICATION OFFICIELLE`, W / 2, 7.5, { align: 'center' })
+
+    // Sceau médaillon central
+    doc.setFillColor(...CERT_GOLD)
+    doc.circle(W / 2, 37, 13, 'F')
+    doc.setFillColor(...CERT_BURGUNDY)
+    doc.circle(W / 2, 37, 10.3, 'F')
+    doc.setFontSize(15)
+    doc.setTextColor(...CERT_GOLD)
+    doc.text('★', W / 2, 41, { align: 'center' })
+
+    doc.setFontSize(25)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...WHITE)
+    doc.text("Certificat d'Excellence", W / 2, 64, { align: 'center' })
+    doc.setFillColor(...CERT_GOLD)
+    doc.rect(W / 2 - 45, 68, 90, 0.8, 'F')
+
+    doc.setFontSize(10.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(230, 210, 190)
+    doc.text(resolvedIntro, W / 2, 82, { align: 'center' })
+
+    doc.setFontSize(21)
+    doc.setFont('times', 'bolditalic')
+    doc.setTextColor(...CERT_GOLD)
+    doc.text(resolvedName, W / 2, 96, { align: 'center' })
+
+    doc.setFontSize(10.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(230, 210, 190)
+    doc.text(resolvedMiddle3, W / 2, 109, { align: 'center' })
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...WHITE)
     const titleLines3 = doc.splitTextToSize(resolvedTitle, W - M * 4)
-    doc.text(titleLines3, W / 2, 143, { align: 'center' })
+    doc.text(titleLines3, W / 2, 118, { align: 'center' })
 
     // Footer premium
-    const fy = H - 28
-    doc.setFillColor(0, 40, 120)
-    doc.rect(14, fy - 4, W - 28, 22, 'F')
-    doc.setFillColor(...CYAN)
-    doc.rect(14, fy - 4, W - 28, 0.8, 'F')
+    const fy = H - 30
+    doc.setDrawColor(...CERT_GOLD)
+    doc.setLineWidth(0.5)
+    doc.line(M + 18, fy - 6, W - M - 18, fy - 6)
 
     doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CYAN)
-    doc.text(`N° ${num}`, M + 8, fy + 5)
+    doc.setTextColor(...CERT_GOLD)
+    doc.text(`N° ${num}`, M + 8, fy + 2)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(160, 190, 220)
-    doc.text('Numéro de certificat', M + 8, fy + 11)
+    doc.setTextColor(210, 190, 175)
+    doc.text('Numéro de certificat', M + 8, fy + 8)
 
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CYAN)
-    doc.text(dateStr, W / 2, fy + 5, { align: 'center' })
+    doc.setTextColor(...CERT_GOLD)
+    doc.text(dateStr, W / 2, fy + 2, { align: 'center' })
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(160, 190, 220)
-    doc.text('Date de délivrance', W / 2, fy + 11, { align: 'center' })
+    doc.setTextColor(210, 190, 175)
+    doc.text('Date de délivrance', W / 2, fy + 8, { align: 'center' })
 
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(180, 255, 220)
-    doc.text('Certifie', W - M - 8, fy + 5, { align: 'right' })
+    doc.setTextColor(...CERT_GOLD)
+    doc.text(resolvedSignatory || 'Signature autorisée', W - M - 8, fy + 2, { align: 'right' })
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(160, 190, 220)
-    doc.text(resolvedEmail, W - M - 8, fy + 11, { align: 'right' })
+    doc.setTextColor(210, 190, 175)
+    doc.text(resolvedSignatoryRole, W - M - 8, fy + 8, { align: 'right' })
   }
 
   doc.save(`Certificat-${template}-${num}.pdf`)
