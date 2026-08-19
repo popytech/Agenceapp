@@ -914,6 +914,8 @@ function isIssuedCertificate(status: string | null | undefined) {
   return ISSUED_CERT_STATUSES.has((status || '').toLowerCase())
 }
 
+const POPYTECH_LOGO_URL = 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/25eb9797-83ec-431b-8731-1404e452f4c6/popy-tech-pro-2026-resized-1772085194508.webp?width=100&height=100&resize=contain'
+
 function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateStr, template, signatoryName, signatoryRole }: {
   studentName: string; trainingTitle: string; certNum: string; dateStr: string; template: CertTemplate
   signatoryName?: string; signatoryRole?: string
@@ -929,10 +931,12 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[46%] aspect-square rounded-full pointer-events-none"
         style={{ border: '1px solid #B48C2D', background: '#F2E9D0', opacity: 0.55 }} />
       <div className="relative h-full flex flex-col items-center text-center">
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-          style={{ background: '#101A40', color: '#B48C2D', border: '1.5px solid #B48C2D' }}>PA</div>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-white shrink-0 p-0.5"
+          style={{ border: '1.5px solid #B48C2D' }}>
+          <img src={POPYTECH_LOGO_URL} alt="Popytech" className="w-full h-full object-contain" />
+        </div>
         <p className="text-[9px] font-bold tracking-widest text-[#101A40] uppercase mt-1.5">Popytech Academy</p>
-        <p className="text-[7px] text-slate-500">www.popytech.com</p>
+        <p className="text-[7px] text-slate-500">popytech.com</p>
         <div className="flex-1 min-h-[6px]" />
         <p className="text-xl font-bold uppercase tracking-tight text-slate-900">Certificat de Formation</p>
         <div className="w-24 h-px bg-[#B48C2D] mt-2 mb-3" />
@@ -960,11 +964,16 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
     <div className="relative w-full aspect-[297/210] bg-white rounded overflow-hidden flex select-none">
       <div className="w-[31%] h-full flex flex-col shrink-0">
         <div className="h-[15%] bg-lime-400 flex items-center px-2">
-          <p className="text-[6px] font-bold text-slate-800">www.popytech.com</p>
+          <p className="text-[6px] font-bold text-slate-800">popytech.com</p>
         </div>
-        <div className="h-[28%] bg-slate-800 flex flex-col justify-center px-2 gap-0.5">
-          <p className="text-[6px] text-lime-400">POPYTECH ACADEMY</p>
-          <p className="text-[9px] font-bold text-white leading-tight">Formation Certifiée</p>
+        <div className="h-[28%] bg-slate-800 flex items-center gap-2 px-2">
+          <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden bg-white shrink-0 p-0.5">
+            <img src={POPYTECH_LOGO_URL} alt="Popytech" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <p className="text-[6px] text-lime-400">POPYTECH ACADEMY</p>
+            <p className="text-[8px] font-bold text-white leading-tight">Formation Certifiée</p>
+          </div>
         </div>
         <div className="h-[11%] bg-teal-600 flex items-center px-2">
           <p className="text-[6.5px] font-bold text-white">#PopytechAcademy</p>
@@ -1011,8 +1020,12 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
       <div className="absolute bottom-0 right-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '22px 22px 0 0', borderColor: '#B48C2D transparent transparent transparent' }} />
       <div className="relative h-full flex flex-col items-center text-center px-4 pb-3">
         <div className="px-3 py-0.5 rounded-b text-[7px] font-bold shrink-0" style={{ background: '#B48C2D', color: '#2E0A18' }}>POPYTECH ACADEMY — CERTIFICATION OFFICIELLE</div>
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base mt-2 shrink-0" style={{ background: '#B48C2D', color: '#2E0A18' }}>★</div>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-white mt-2 shrink-0 p-0.5" style={{ border: '2px solid #B48C2D' }}>
+          <img src={POPYTECH_LOGO_URL} alt="Popytech" className="w-full h-full object-contain" />
+        </div>
         <p className="text-2xl font-bold text-white mt-2">Certificat d'Excellence</p>
+        <div className="w-20 h-px mt-1.5 mb-0.5" style={{ background: '#B48C2D' }} />
+        <p className="text-[7px]" style={{ color: '#C9AA8C' }}>popytech.com</p>
         <div className="w-20 h-px mt-1.5 mb-2" style={{ background: '#B48C2D' }} />
         <p className="text-[9px]" style={{ color: '#E6D2BE' }}>Ce certificat est décerné à</p>
         <p className="text-xl font-bold italic mt-1" style={{ color: '#D9B24C', fontFamily: 'Georgia, serif' }}>{studentName}</p>
@@ -1147,7 +1160,7 @@ function CertificationsTab({ certifications, trainings, profiles, enrollments, r
       middle:        'pour avoir complété avec succès la formation :',
       orgName:       'POPYTECH ACADEMY',
       contactEmail:  'contact@popytech.com',
-      website:       'www.popytech.com',
+      website:       'popytech.com',
       signatoryName: '',
       signatoryRole: 'La Responsable de la Formation',
     })

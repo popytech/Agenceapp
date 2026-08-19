@@ -1446,19 +1446,63 @@ export interface CertificateOverrides {
   signatoryRole?: string   // défaut: "La Responsable de la Formation"
 }
 
-export function downloadFormationCertificatePDF(cert: {
+// Logo officiel Popytech — obligatoire sur tous les certificats
+export const POPYTECH_LOGO_URL = 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/25eb9797-83ec-431b-8731-1404e452f4c6/popy-tech-pro-2026-resized-1772085194508.webp?width=240&height=240&resize=contain'
+
+let logoDataUrlPromise: Promise<string | null> | null = null
+// Convertit le logo distant (webp) en PNG base64 via canvas — jsPDF ne sait pas décoder le webp directement
+function loadPopytechLogoDataUrl(): Promise<string | null> {
+  if (typeof window === 'undefined') return Promise.resolve(null)
+  if (!logoDataUrlPromise) {
+    logoDataUrlPromise = new Promise((resolve) => {
+      const img = new window.Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas')
+          canvas.width = img.naturalWidth || 240
+          canvas.height = img.naturalHeight || 240
+          const ctx = canvas.getContext('2d')
+          if (!ctx) { resolve(null); return }
+          ctx.drawImage(img, 0, 0)
+          resolve(canvas.toDataURL('image/png'))
+        } catch {
+          resolve(null)
+        }
+      }
+      img.onerror = () => resolve(null)
+      img.src = POPYTECH_LOGO_URL
+    })
+  }
+  return logoDataUrlPromise
+}
+
+// Dessine le logo Popytech dans un cercle (backing blanc) centré en (cx, cy), diamètre `d`
+function drawPopytechLogo(doc: jsPDF, logo: string | null, cx: number, cy: number, d: number) {
+  doc.setFillColor(255, 255, 255)
+  doc.circle(cx, cy, d / 2, 'F')
+  if (logo) {
+    const pad = d * 0.16
+    try {
+      doc.addImage(logo, 'PNG', cx - d / 2 + pad, cy - d / 2 + pad, d - pad * 2, d - pad * 2)
+    } catch { /* logo indisponible, le fond blanc reste visible */ }
+  }
+}
+
+export async function downloadFormationCertificatePDF(cert: {
   id: string
   certificate_number: string | null
   issued_at: string
   status: string
 }, studentName: string, trainingTitle: string, template: CertificateTemplate = 'moderne', overrides?: CertificateOverrides) {
+  const logo = await loadPopytechLogoDataUrl()
   const resolvedDate    = overrides?.issuedAt || cert.issued_at
   const resolvedName    = overrides?.studentName  || studentName
   const resolvedTitle   = overrides?.trainingTitle || trainingTitle
   const resolvedNum     = overrides?.certNumber    || cert.certificate_number || 'N/A'
   const resolvedOrg     = overrides?.orgName       || 'POPYTECH ACADEMY'
   const resolvedEmail   = overrides?.contactEmail  || AGENCY.email
-  const resolvedSite    = overrides?.website       || AGENCY.website
+  const resolvedSite    = overrides?.website       || 'popytech.com'
   const resolvedIntro   = overrides?.intro         || 'Ce certificat est décerné à'
   const resolvedMiddle  = overrides?.middle        || 'pour avoir complété avec succès la formation :'
   const resolvedMiddle2 = overrides?.middle        || 'pour avoir complété avec succès :'
@@ -1503,16 +1547,11 @@ export function downloadFormationCertificatePDF(cert: {
       doc.rect(cx + 2, cy + 2, cs - 4, cs - 4, 'F')
     })
 
-    // Médaillon logo centré
-    doc.setFillColor(...CERT_NAVY)
-    doc.circle(W / 2, 27, 10, 'F')
+    // Médaillon avec le logo officiel Popytech
     doc.setDrawColor(...CERT_GOLD)
     doc.setLineWidth(0.8)
+    drawPopytechLogo(doc, logo, W / 2, 27, 20)
     doc.circle(W / 2, 27, 10)
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...CERT_GOLD)
-    doc.text('PA', W / 2, 29.8, { align: 'center' })
 
     doc.setFontSize(10)
     doc.setFont('helvetica', 'bold')
@@ -1522,6 +1561,7 @@ export function downloadFormationCertificatePDF(cert: {
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(...MUTED)
     doc.text(resolvedSite, W / 2, 50.5, { align: 'center' })
+    doc.link(W / 2 - 16, 47, 32, 5, { url: `https://${resolvedSite.replace(/^https?:\/\//, '')}` })
 
     doc.setFontSize(30)
     doc.setFont('helvetica', 'bold')
@@ -1598,19 +1638,21 @@ export function downloadFormationCertificatePDF(cert: {
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...CERT_CHARCOAL)
     doc.text(resolvedSite, 10, 19)
+    doc.link(6, 13, 50, 8, { url: `https://${resolvedSite.replace(/^https?:\/\//, '')}` })
 
-    // Bloc identité marine
+    // Bloc identité marine (logo + nom de l'organisme)
     doc.setFillColor(...CERT_CHARCOAL)
     doc.rect(0, 32, SIDE_W, 58, 'F')
-    doc.setFontSize(8)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...CERT_LIME)
-    doc.text(resolvedOrg, 10, 48)
+    drawPopytechLogo(doc, logo, 22, 51, 20)
     doc.setFontSize(15)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...WHITE)
-    const orgLines = doc.splitTextToSize('Formation Certifiée', SIDE_W - 20)
-    doc.text(orgLines, 10, 60)
+    const orgLines = doc.splitTextToSize('Formation Certifiée', SIDE_W - 42)
+    doc.text(orgLines, 38, 48)
+    doc.setFontSize(7)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...CERT_LIME)
+    doc.text(resolvedOrg, 38, 60)
 
     // Bloc sarcelle (tag)
     doc.setFillColor(...CERT_TEAL)
@@ -1743,14 +1785,10 @@ export function downloadFormationCertificatePDF(cert: {
     doc.setTextColor(...CERT_BURGUNDY)
     doc.text(`${resolvedOrg} — CERTIFICATION OFFICIELLE`, W / 2, 7.5, { align: 'center' })
 
-    // Sceau médaillon central
+    // Sceau médaillon central — logo Popytech cerclé d'or
     doc.setFillColor(...CERT_GOLD)
     doc.circle(W / 2, 37, 13, 'F')
-    doc.setFillColor(...CERT_BURGUNDY)
-    doc.circle(W / 2, 37, 10.3, 'F')
-    doc.setFontSize(15)
-    doc.setTextColor(...CERT_GOLD)
-    doc.text('★', W / 2, 41, { align: 'center' })
+    drawPopytechLogo(doc, logo, W / 2, 37, 19.5)
 
     doc.setFontSize(27)
     doc.setFont('helvetica', 'bold')
@@ -1758,6 +1796,12 @@ export function downloadFormationCertificatePDF(cert: {
     doc.text("Certificat d'Excellence", W / 2, 64, { align: 'center' })
     doc.setFillColor(...CERT_GOLD)
     doc.rect(W / 2 - 45, 68, 90, 0.8, 'F')
+
+    doc.setFontSize(7.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(220, 200, 180)
+    doc.text(resolvedSite, W / 2, 74.5, { align: 'center' })
+    doc.link(W / 2 - 20, 71.5, 40, 5, { url: `https://${resolvedSite.replace(/^https?:\/\//, '')}` })
 
     doc.setFontSize(11)
     doc.setFont('helvetica', 'normal')
