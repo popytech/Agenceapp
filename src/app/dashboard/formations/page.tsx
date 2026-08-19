@@ -922,25 +922,35 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
 
   if (template === 'classique') return (
     // Inspiré : cadre or & marine, médaillon, titre imposant
-    <div className="relative w-full aspect-[297/210] flex flex-col items-center p-4 pt-3 overflow-hidden select-none"
+    <div className="relative w-full aspect-[297/210] p-4 overflow-hidden select-none"
       style={{ background: '#FDFAF0', border: '3px solid #B48C2D' }}>
       <div className="absolute inset-[7px] border border-[#101A40] pointer-events-none" />
-      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold mt-1"
-        style={{ background: '#101A40', color: '#B48C2D', border: '1.5px solid #B48C2D' }}>PA</div>
-      <p className="text-[8px] font-bold tracking-widest text-[#101A40] uppercase mt-1.5">Popytech Academy</p>
-      <p className="text-[7px] font-bold uppercase tracking-tight text-slate-900 mt-2.5 text-center">Certificat de Formation</p>
-      <div className="w-16 h-px bg-[#B48C2D] mt-1 mb-1.5" />
-      <p className="text-[8px] text-slate-500">Ce certificat est décerné à :</p>
-      <p className="text-base font-bold italic text-[#101A40] mt-0.5" style={{ fontFamily: 'Georgia, serif' }}>{studentName}</p>
-      <div className="w-20 h-px bg-[#B48C2D] mt-1 mb-1" />
-      <p className="text-[7.5px] text-slate-600">pour avoir complété avec succès la formation :</p>
-      <p className="text-[9px] font-bold text-[#101A40] text-center px-4">{trainingTitle}</p>
-      <div className="absolute bottom-2 left-3 text-[6.5px] text-slate-500 leading-tight">
-        <p>Fait le {dateStr}</p><p className="text-slate-400">N° {certNum}</p>
-      </div>
-      <div className="absolute bottom-2 right-3 text-[6.5px] text-right leading-tight">
-        {signatoryName && <p className="font-bold italic text-[#101A40]">{signatoryName}</p>}
-        <p className="text-slate-500 border-t border-[#B48C2D] pt-0.5 mt-0.5">{role}</p>
+      {/* Filigrane décoratif central */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[46%] aspect-square rounded-full pointer-events-none"
+        style={{ border: '1px solid #B48C2D', background: '#F2E9D0', opacity: 0.55 }} />
+      <div className="relative h-full flex flex-col items-center text-center">
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+          style={{ background: '#101A40', color: '#B48C2D', border: '1.5px solid #B48C2D' }}>PA</div>
+        <p className="text-[9px] font-bold tracking-widest text-[#101A40] uppercase mt-1.5">Popytech Academy</p>
+        <p className="text-[7px] text-slate-500">www.popytech.com</p>
+        <div className="flex-1 min-h-[6px]" />
+        <p className="text-xl font-bold uppercase tracking-tight text-slate-900">Certificat de Formation</p>
+        <div className="w-24 h-px bg-[#B48C2D] mt-2 mb-3" />
+        <p className="text-[10px] text-slate-500">Ce certificat est décerné à :</p>
+        <p className="text-2xl font-bold italic text-[#101A40] mt-1" style={{ fontFamily: 'Georgia, serif' }}>{studentName}</p>
+        <div className="w-28 h-px bg-[#B48C2D] mt-2 mb-2" />
+        <p className="text-[9px] text-slate-600">pour avoir complété avec succès la formation :</p>
+        <p className="text-sm font-bold text-[#101A40] px-6 mt-1">{trainingTitle}</p>
+        <div className="flex-1 min-h-[6px]" />
+        <p className="text-[8px] italic text-slate-500 max-w-[85%]">En foi de quoi, le présent certificat lui est délivré pour servir et valoir ce que de droit.</p>
+        <div className="flex-1 min-h-[6px]" />
+        <div className="w-full flex items-end justify-between text-[7px] shrink-0">
+          <div className="text-left text-slate-500 leading-tight"><p>Fait le {dateStr}</p><p className="text-slate-400">N° {certNum}</p></div>
+          <div className="text-right leading-tight">
+            {signatoryName && <p className="font-bold italic text-[#101A40] text-[9px]">{signatoryName}</p>}
+            <p className="text-slate-500 border-t border-[#B48C2D] pt-0.5 mt-0.5">{role}</p>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -948,7 +958,7 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
   if (template === 'moderne') return (
     // Inspiré : blocs géométriques sarcelle / marine / citron vert
     <div className="relative w-full aspect-[297/210] bg-white rounded overflow-hidden flex select-none">
-      <div className="w-[31%] flex flex-col shrink-0">
+      <div className="w-[31%] h-full flex flex-col shrink-0">
         <div className="h-[15%] bg-lime-400 flex items-center px-2">
           <p className="text-[6px] font-bold text-slate-800">www.popytech.com</p>
         </div>
@@ -959,19 +969,31 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
         <div className="h-[11%] bg-teal-600 flex items-center px-2">
           <p className="text-[6.5px] font-bold text-white">#PopytechAcademy</p>
         </div>
-        <div className="flex-1 bg-slate-50 px-2 py-1.5 flex flex-col justify-center gap-1">
+        <div className="flex-1 bg-slate-50 px-2 py-1.5 flex flex-col justify-center gap-1.5">
           <div><p className="text-[5.5px] font-bold text-slate-700">DATE</p><p className="text-[7px] text-slate-500">{dateStr}</p></div>
           <div><p className="text-[5.5px] font-bold text-slate-700">N° CERTIFICAT</p><p className="text-[7px] text-slate-500">{certNum}</p></div>
+          <p className="text-lg text-lime-500 mt-1">✳</p>
         </div>
       </div>
-      <div className="flex-1 p-4 flex flex-col justify-center">
-        <p className="text-2xl font-bold text-slate-800 leading-tight">Certificat<br/><span className="text-teal-600">de Réussite</span></p>
-        <div className="w-10 h-1 bg-lime-400 my-2" />
-        <p className="text-[9px] text-slate-400 mb-1">Ce certificat est décerné à</p>
-        <p className="text-lg font-bold text-teal-700 mb-1">{studentName}</p>
-        <p className="text-[9px] text-slate-500">pour avoir complété avec succès :</p>
-        <p className="text-[10px] font-bold text-slate-700">{trainingTitle}</p>
-        <div className="mt-auto pt-3 flex gap-8 border-t border-slate-200 text-[7px]">
+      <div className="flex-1 h-full flex flex-col px-5 py-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-3xl font-bold text-slate-800 leading-tight">Certificat</p>
+            <p className="text-3xl font-bold text-teal-600 leading-tight">de Réussite</p>
+          </div>
+          <p className="text-xl text-lime-500">✳</p>
+        </div>
+        <div className="w-12 h-1.5 bg-lime-400 mt-2 mb-4" />
+        <p className="text-[10px] text-slate-400">Ce certificat est décerné à</p>
+        <p className="text-2xl font-bold text-teal-700 mt-1">{studentName}</p>
+        <p className="text-[10px] text-slate-500 mt-3">pour avoir complété avec succès :</p>
+        <p className="text-base font-bold text-slate-700">{trainingTitle}</p>
+        <div className="flex-1 flex items-center min-h-[10px]">
+          <p className="text-[9px] italic text-teal-700 bg-teal-50 rounded px-3 py-2 w-full">
+            Certification délivrée par Popytech Academy — Bobo Dioulasso, Burkina Faso
+          </p>
+        </div>
+        <div className="flex gap-10 border-t border-slate-200 pt-2 text-[8px] shrink-0">
           <div><p className="font-bold text-slate-700">{signatoryName || '—'}</p><p className="text-slate-400">{role}</p></div>
           <div><p className="font-bold text-slate-700">Popytech Academy</p><p className="text-slate-400">Direction Académique</p></div>
         </div>
@@ -981,24 +1003,33 @@ function CertificateTemplatePreview({ studentName, trainingTitle, certNum, dateS
 
   return (
     // Inspiré : ruban doré, sceau médaillon, fond bordeaux
-    <div className="relative w-full aspect-[297/210] rounded overflow-hidden flex flex-col items-center p-4 select-none"
+    <div className="relative w-full aspect-[297/210] rounded overflow-hidden select-none"
       style={{ background: '#2E0A18', border: '1px solid #B48C2D' }}>
       <div className="absolute top-0 left-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '0 0 22px 22px', borderColor: 'transparent transparent transparent #B48C2D' }} />
       <div className="absolute top-0 right-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '0 22px 22px 0', borderColor: 'transparent #B48C2D transparent transparent' }} />
       <div className="absolute bottom-0 left-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '22px 0 0 22px', borderColor: 'transparent transparent transparent #B48C2D' }} />
       <div className="absolute bottom-0 right-0 w-0 h-0" style={{ borderStyle: 'solid', borderWidth: '22px 22px 0 0', borderColor: '#B48C2D transparent transparent transparent' }} />
-      <div className="px-3 py-0.5 rounded-b text-[6.5px] font-bold" style={{ background: '#B48C2D', color: '#2E0A18' }}>POPYTECH ACADEMY — CERTIFICATION OFFICIELLE</div>
-      <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm mt-2" style={{ background: '#B48C2D', color: '#2E0A18' }}>★</div>
-      <p className="text-lg font-bold text-white mt-2">Certificat d'Excellence</p>
-      <div className="w-16 h-px mt-1 mb-1.5" style={{ background: '#B48C2D' }} />
-      <p className="text-[8px] mt-1" style={{ color: '#E6D2BE' }}>Ce certificat est décerné à</p>
-      <p className="text-base font-bold italic mt-0.5" style={{ color: '#D9B24C', fontFamily: 'Georgia, serif' }}>{studentName}</p>
-      <p className="text-[8px] mt-1.5 text-center" style={{ color: '#E6D2BE' }}>pour avoir maîtrisé avec excellence</p>
-      <p className="text-[9px] font-bold text-white text-center">{trainingTitle}</p>
-      <div className="absolute bottom-2 left-0 right-0 flex justify-between px-4 text-[6.5px]" style={{ color: '#C9AA8C' }}>
-        <span>N° {certNum}</span>
-        <span>{dateStr}</span>
-        <span className="font-bold" style={{ color: '#D9B24C' }}>{signatoryName || role}</span>
+      <div className="relative h-full flex flex-col items-center text-center px-4 pb-3">
+        <div className="px-3 py-0.5 rounded-b text-[7px] font-bold shrink-0" style={{ background: '#B48C2D', color: '#2E0A18' }}>POPYTECH ACADEMY — CERTIFICATION OFFICIELLE</div>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base mt-2 shrink-0" style={{ background: '#B48C2D', color: '#2E0A18' }}>★</div>
+        <p className="text-2xl font-bold text-white mt-2">Certificat d'Excellence</p>
+        <div className="w-20 h-px mt-1.5 mb-2" style={{ background: '#B48C2D' }} />
+        <p className="text-[9px]" style={{ color: '#E6D2BE' }}>Ce certificat est décerné à</p>
+        <p className="text-xl font-bold italic mt-1" style={{ color: '#D9B24C', fontFamily: 'Georgia, serif' }}>{studentName}</p>
+        <p className="text-[9px] mt-2" style={{ color: '#E6D2BE' }}>pour avoir maîtrisé avec excellence</p>
+        <p className="text-sm font-bold text-white px-6">{trainingTitle}</p>
+        <div className="flex-1 flex items-center justify-center min-h-[10px]">
+          <div className="flex items-center gap-2" style={{ color: '#B48C2D' }}>
+            <span className="w-14 h-px" style={{ background: '#B48C2D' }} />
+            <span>✦</span>
+            <span className="w-14 h-px" style={{ background: '#B48C2D' }} />
+          </div>
+        </div>
+        <div className="w-full border-t pt-2 flex justify-between text-[7.5px] shrink-0" style={{ borderColor: '#B48C2D', color: '#C9AA8C' }}>
+          <div className="text-left"><p className="font-bold" style={{ color: '#D9B24C' }}>N° {certNum}</p><p>Numéro de certificat</p></div>
+          <div className="text-center"><p className="font-bold" style={{ color: '#D9B24C' }}>{dateStr}</p><p>Date de délivrance</p></div>
+          <div className="text-right"><p className="font-bold italic" style={{ color: '#D9B24C' }}>{signatoryName || 'Signature autorisée'}</p><p>{role}</p></div>
+        </div>
       </div>
     </div>
   )
